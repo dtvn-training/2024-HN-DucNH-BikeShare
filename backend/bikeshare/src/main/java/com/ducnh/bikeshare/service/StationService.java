@@ -19,7 +19,7 @@ import java.util.UUID;
 public class StationService {
     private static final Logger log = LoggerFactory.getLogger(StationService.class);
 
-    public StationHolder getStations() {
+    public StationHolder getStations(String query) {
         log.info("query started");
 
         StationHolder stationHolder = new StationHolder();
@@ -30,9 +30,7 @@ public class StationService {
 
         BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
 
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(
-                        "SELECT * "
-                                + "FROM `springboot-bq.bikeshare.stations`")
+        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query)
                 .setUseLegacySql(false)
                 .build();
 
