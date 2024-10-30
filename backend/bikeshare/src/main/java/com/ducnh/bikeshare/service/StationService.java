@@ -3,11 +3,13 @@ package com.ducnh.bikeshare.service;
 import com.ducnh.bikeshare.model.Station;
 import com.ducnh.bikeshare.model.StationHolder;
 import com.google.cloud.bigquery.*;
+import lombok.Value;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 
+import java.time.LocalDateTime;
+import java.time.ZoneId;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
@@ -30,8 +32,7 @@ public class StationService {
 
         QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(
                         "SELECT * "
-                                + "FROM `springboot-bq.bikeshare.stations`"
-                                + "LIMIT 1000")
+                                + "FROM `springboot-bq.bikeshare.stations`")
                 .setUseLegacySql(false)
                 .build();
 
@@ -57,25 +58,25 @@ public class StationService {
             TableResult result = queryJob.getQueryResults();
 
             for (FieldValueList row : result.iterateAll()) {
-                int station_id = row.get("station_id").getNumericValue().intValue();
-                String name = row.get("name").getStringValue();
-                String status = row.get("status").getStringValue();
-                String location = row.get("location").getStringValue();
-                String address = row.get("address").getStringValue();
-                String alternate_name = row.get("alternate_name").getStringValue();
-                int city_asset_number = row.get("city_asset_number").getNumericValue().intValue();
-                String property_type = row.get("property_type").getStringValue();
-                int number_of_docks = row.get("number_of_docks").getNumericValue().intValue();
-                String power_type = row.get("power_type").getStringValue();
-                int footprint_length = row.get("footprint_length").getNumericValue().intValue();
-                float footprint_width = row.get("footprint_width").getNumericValue().floatValue();
-                String notes = row.get("notes").getStringValue();
-                int council_district = row.get("council_district").getNumericValue().intValue();
-                // modified date to add later
-                log.info(name);
+                int station_id = !row.get("station_id").isNull() ? row.get("station_id").getNumericValue().intValue() : 0;
+                String name = !row.get("name").isNull() ? row.get("name").getStringValue() : "";
+                String status = !row.get("status").isNull() ? row.get("status").getStringValue() : "";
+                String location = !row.get("location").isNull() ? row.get("location").getStringValue() : "";
+                String address = !row.get("address").isNull() ? row.get("address").getStringValue() : "";
+                String alternate_name = !row.get("alternate_name").isNull() ? row.get("alternate_name").getStringValue() : "";
+                int city_asset_number = !row.get("city_asset_number").isNull() ? row.get("city_asset_number").getNumericValue().intValue() : 0;
+                String property_type = !row.get("property_type").isNull() ? row.get("property_type").getStringValue() : "";
+                int number_of_docks = !row.get("number_of_docks").isNull() ? row.get("number_of_docks").getNumericValue().intValue() : 0;
+                String power_type = !row.get("power_type").isNull() ? row.get("power_type").getStringValue() : "";
+                int footprint_length = !row.get("footprint_length").isNull() ? row.get("footprint_length").getNumericValue().intValue() : 0;
+                float footprint_width = !row.get("footprint_width").isNull() ? row.get("footprint_width").getNumericValue().floatValue() : 0f;
+                String notes = !row.get("notes").isNull() ? row.get("notes").getStringValue() : "";
+                int council_district = !row.get("council_district").isNull() ? row.get("council_district").getNumericValue().intValue() : 0;
+                ZoneId zoneId = ZoneId.of("UTC");
+                LocalDateTime modified_date = !row.get("modified_date").isNull() ? row.get("modified_date").getTimestampInstant().atZone(zoneId).toLocalDateTime() : null;
+
                 Station station = new Station(station_id, name, status, location, address, alternate_name, city_asset_number, property_type, number_of_docks, power_type, footprint_length,
-                        footprint_width, notes, council_district);
-                log.info(station.toString());
+                        footprint_width, notes, council_district, modified_date);
 
                 stations.add(station);
 
