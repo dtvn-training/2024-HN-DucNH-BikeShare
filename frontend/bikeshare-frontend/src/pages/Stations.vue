@@ -31,7 +31,7 @@
                     </v-range-slider>
                 </div>
                 <div class="center">
-                    <v-btn variant="outlined" class="btn">Search</v-btn>
+                    <v-btn variant="outlined" class="btn" @click="getStations">Search</v-btn>
                 </div>
             </div>
         </div>
@@ -45,8 +45,7 @@
                         <v-btn variant="outlined" class="btn">Export</v-btn>
                     </div>
                 </div>
-                <v-data-table-server :headers="header" :items="trips" hide-default-footer>
-                </v-data-table-server>
+                <v-data-table-server :headers="header" :items="stations" hide-default-footer></v-data-table-server>
             </div>
         </div>
     </div>
@@ -55,6 +54,7 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
 import { ref } from 'vue';
+import api from '@/config/api';
 
 const header = [
     { title: 'Name', key: 'name', sortable: false },
@@ -65,8 +65,8 @@ const header = [
     { title: 'Property type', key: 'property_type', sortable: false },
     { title: 'Number of docks', key: 'number_of_docks', sortable: false },
     { title: 'Power type', key: 'power_type', sortable: false },
-    { title: 'Foot print length', key: 'foot_print_length', sortable: false },
-    { title: 'Foot print width', key: 'foot_print_width', sortable: false },
+    { title: 'Foot print length', key: 'footprint_length', sortable: false },
+    { title: 'Foot print width', key: 'footprint_width', sortable: false },
     { title: 'Council district', key: 'council_district', sortable: false },
     { title: 'Modified date', key: 'modified_date', sortable: false },
 ]
@@ -104,9 +104,20 @@ const trips = [
     }
 ]
 
+const stations = ref()
+
 const length_value = ref([0, 100])
 const width_value = ref([0, 20])
 
+async function getStations() {
+    await api.get(`/stations/`)
+        .then((response) => {
+            stations.value = response.data.stations
+            console.log("1");
+        }).catch((error) => {
+            console.log(error);
+        })
+}
 
 </script>
 
