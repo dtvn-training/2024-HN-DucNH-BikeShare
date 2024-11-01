@@ -49,7 +49,7 @@
                             <v-time-picker
                                 v-if="menu2"
                                 v-model="time"
-                                full-width
+                                full-width format="24hr"
                             ></v-time-picker>
                         </v-menu>
                     </v-text-field>

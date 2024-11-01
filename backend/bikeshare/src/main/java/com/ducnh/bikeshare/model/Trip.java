@@ -20,4 +20,8 @@ public class Trip {
     private String end_station_id;
     private String end_station_name;
     private Integer duration_minutes;
+
+    public Trip(String trip_id) {
+        trip_id = this.trip_id;
+    }
 }

@@ -8,26 +8,40 @@
                     <h3 class="title">Search</h3>
                 </div>
                 <div class="search-section">
-                    <v-text-field label="Station name"></v-text-field>
-                    <v-radio-group inline label="Status">
+                    <v-text-field 
+                        label="Station name"
+                        v-model:model-value="param_name">
+                    </v-text-field>
+                    <v-radio-group inline label="Status" v-model="param_status">
                         <v-radio label="Any" value=""></v-radio>
                         <v-radio label="Active" value="active"></v-radio>
                         <v-radio label="Closed" value="closed"></v-radio>
                     </v-radio-group>
-                    <v-text-field label="Address"></v-text-field>
-                    <v-text-field label="Property type"></v-text-field>
-                    <v-radio-group inline label="Power type">
+                    <v-text-field 
+                        label="Address"
+                        v-model="param_address">
+                    </v-text-field>
+                    <v-select
+                        label="Property type"
+                        :items="property_options"
+                        v-model="param_property_type"
+                    ></v-select>
+                    <v-radio-group inline label="Power type" v-model="param_power_type">
                         <v-radio label="Any" value=""></v-radio>
                         <v-radio label="Solar" value="solar"></v-radio>
                         <v-radio label="Non-metered" value="non_metered"></v-radio>
                     </v-radio-group>
+                    <v-range-slider label="Number of docks"
+                                    v-model="docks_value"
+                                    strict thumb-label="always" :thumb-size="10" :min="min_dock" :max="max_dock" :step="1">
+                    </v-range-slider>
                     <v-range-slider label="Foot print length"
                                     v-model="length_value"
-                                    strict thumb-label="always" :thumb-size="10" :min="0" :max="100" :step="1">
+                                    strict thumb-label="always" :thumb-size="10" :min="min_length" :max="max_length" :step="1">
                     </v-range-slider>
                     <v-range-slider label="Foot print width"
                                     v-model="width_value"
-                                    strict thumb-label="always" :thumb-size="10" :min="0" :max="20" :step="1">
+                                    strict thumb-label="always" :thumb-size="10" :min="min_width" :max="max_width" :step="0.5">
                     </v-range-slider>
                 </div>
                 <div class="center">
@@ -53,7 +67,7 @@
 
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
 import api from '@/config/api';
 
 const header = [
@@ -71,49 +85,76 @@ const header = [
     { title: 'Modified date', key: 'modified_date', sortable: false },
 ]
 
-const trips = [
-    {
-        name: "Test Example",
-        status: "Active",
-        address: "243A De La Thanh",
-        city_asset_number: "4361725371",
-        alternate_name: "",
-        property_type: "nonmetered_parking",
-        number_of_docks: 12,
-        power_type: "Solar",
-        foot_print_length: 50,
-        foot_print_width: 20,
-        council_district: 2,
-        modified_date: '2021-01-04 00:00:00 UTC'
-    },
-    {
-        name: "Lorem Ipsum",
-        status: "Closed",
-        address: "1 Dai Co Viet",
-        city_asset_number: "4361725371",
-        power_type: "Classic",
-        foot_print_length: 34
-    },
-    {
-        name: "Test Example",
-        status: "Active",
-        address: "243A De La Thanh",
-        city_asset_number: "4361725371",
-        power_type: "Solar",
-        foot_print_length: 50
-    }
-]
-
 const stations = ref()
+const property_options = ref(["Any", "paid_parking", "sidewalk", "parkland", "undetermined_parking", "nonmetered_parking"])
 
-const length_value = ref([0, 100])
+let min_dock = ref(0)
+let max_dock = ref(30)
+let min_length = ref(0)
+let max_length = ref(70)
+let min_width = ref(0.0)
+let max_width = ref(20.0)
+
+const param_name = ref()
+const param_status = ref()
+const param_address = ref()
+const param_property_type = ref()
+const param_power_type = ref()
+let param_min_number_of_docks = ref()
+let param_max_number_of_docks = ref()
+let param_min_footprint_length = ref()
+let param_max_footprint_length = ref()
+let param_min_footprint_width = ref()
+let param_max_footprint_width = ref()
+
+const docks_value = ref([0, 30])
+const length_value = ref([0, 70])
 const width_value = ref([0, 20])
 
 async function getStations() {
-    await api.get(`/stations/`)
+    param_min_number_of_docks = computed(() => {
+        const min = Math.min(...docks_value.value)
+        return min == min_dock.value? "" : min
+    })
+    param_max_number_of_docks = computed(() => {
+        const max = Math.max(...docks_value.value)
+        return max == max_dock.value? "" : max
+    })
+    param_min_footprint_length = computed(() => {
+        const min = Math.min(...length_value.value)
+        return min == min_length.value? "" : min
+    })
+    param_max_footprint_length = computed(() => {
+        const max = Math.max(...length_value.value)
+        return max == max_length.value? "" : max
+    })
+    param_min_footprint_width = computed(() => {
+        const min = Math.min(...width_value.value)
+        return min == min_width.value? "" : min
+    })
+    param_max_footprint_width = computed(() => {
+        const max = Math.max(...width_value.value)
+        return max == max_width.value? "" : max
+    })
+    await api.get(`/stations`, {
+        params: {
+            name: param_name.value,
+            address: param_address.value,
+            status: param_status.value,
+            property_type: param_property_type.value,
+            power_type: param_power_type.value,
+            min_number_of_docks: param_min_number_of_docks.value,
+            max_number_of_docks: param_max_number_of_docks.value,
+            min_footprint_length: param_min_footprint_length.value,
+            max_footprint_length: param_max_footprint_length.value,
+            min_footprint_width: param_min_footprint_width.value,
+            max_footprint_width: param_max_footprint_width.value,
+        }
+    })
         .then((response) => {
             stations.value = response.data.stations
             console.log("1");
+            console.log(param_max_footprint_width.value)
         }).catch((error) => {
             console.log(error);
         })
