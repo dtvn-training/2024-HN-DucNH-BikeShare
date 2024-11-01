@@ -119,6 +119,9 @@ async function getStations() {
         })
 }
 
+const length_value = ref([0, 100])
+const width_value = ref([0, 20])
+
 </script>
 
 <style>
