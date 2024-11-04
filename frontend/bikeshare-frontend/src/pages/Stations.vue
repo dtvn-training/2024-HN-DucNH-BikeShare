@@ -53,13 +53,14 @@
         <div class="col w-2">
             <div class="table-content">
                 <div class="table-header">
-                    <v-pagination length="5"></v-pagination>
+                    <!-- <v-pagination length="5"></v-pagination> -->
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
                         <v-btn variant="outlined" class="btn">Export</v-btn>
                     </div>
                 </div>
-                <v-data-table-server :headers="header" :items="stations" hide-default-footer></v-data-table-server>
+                <v-data-table :headers="header" :items="stations">
+                </v-data-table>
             </div>
         </div>
     </div>
@@ -84,7 +85,6 @@ const header = [
     { title: 'Council district', key: 'council_district', sortable: false },
     { title: 'Modified date', key: 'modified_date', sortable: false },
 ]
-
 const stations = ref()
 const property_options = ref(["Any", "paid_parking", "sidewalk", "parkland", "undetermined_parking", "nonmetered_parking"])
 
@@ -100,6 +100,7 @@ const param_status = ref()
 const param_address = ref()
 const param_property_type = ref()
 const param_power_type = ref()
+
 let param_min_number_of_docks = ref()
 let param_max_number_of_docks = ref()
 let param_min_footprint_length = ref()
@@ -153,7 +154,6 @@ async function getStations() {
     })
         .then((response) => {
             stations.value = response.data.stations
-            console.log("1");
             console.log(param_max_footprint_width.value)
         }).catch((error) => {
             console.log(error);

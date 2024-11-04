@@ -11,17 +11,13 @@ import java.time.LocalDateTime;
 @AllArgsConstructor
 public class Trip {
     private String trip_id;
-    private String subscriber_type;
-    private String bike_id;
-    private String bike_type;
-    private LocalDateTime start_time;
-    private Integer start_station_id;
-    private String start_station_name;
-    private String end_station_id;
-    private String end_station_name;
-    private Integer duration_minutes;
-
-    public Trip(String trip_id) {
-        trip_id = this.trip_id;
-    }
+//    private String subscriber_type;
+//    private String bike_id;
+//    private String bike_type;
+//    private LocalDateTime start_time;
+//    private Integer start_station_id;
+//    private String start_station_name;
+//    private String end_station_id;
+//    private String end_station_name;
+//    private Integer duration_minutes;
 }

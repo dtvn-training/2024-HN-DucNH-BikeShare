@@ -4,10 +4,7 @@ import com.ducnh.bikeshare.model.TripHolder;
 import com.ducnh.bikeshare.service.TripService;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 @Slf4j
 @RestController
@@ -18,9 +15,9 @@ public class TripController {
     TripService tripService;
 
     @GetMapping()
-    public TripHolder getTrips() {
+    public TripHolder getTrips(@RequestParam(name = "offset", defaultValue = "0") Integer offset) {
         StringBuilder query = new StringBuilder("SELECT trip_id "
-                + "FROM `springboot-bq.bikeshare.trips`");
+                + "FROM `springboot-bq.bikeshare.trips` LIMIT 200 OFFSET " + offset);
 
         String clause = " WHERE";
         String query_format = "";
