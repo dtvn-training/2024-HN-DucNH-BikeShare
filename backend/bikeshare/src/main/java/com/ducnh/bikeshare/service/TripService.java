@@ -59,19 +59,18 @@ public class TripService {
 
             for (FieldValueList row : result.iterateAll()) {
                 String trip_id = !row.get("trip_id").isNull() ? row.get("trip_id").getStringValue() : "";
-//                String subscriber_type = !row.get("subscriber_type").isNull() ? row.get("subscriber_type").getStringValue() : "";
-//                String bike_id = !row.get("bike_id").isNull() ? row.get("bike_id").getStringValue() : "";
-//                String bike_type = !row.get("bike_type").isNull() ? row.get("bike_type").getStringValue() : "";
-//                ZoneId zoneId = ZoneId.of("UTC");
-//                LocalDateTime start_time = !row.get("start_time").isNull() ? row.get("start_time").getTimestampInstant().atZone(zoneId).toLocalDateTime() : null;
+                String subscriber_type = !row.get("subscriber_type").isNull() ? row.get("subscriber_type").getStringValue() : "";
+                String bike_id = !row.get("bike_id").isNull() ? row.get("bike_id").getStringValue() : "";
+                String bike_type = !row.get("bike_type").isNull() ? row.get("bike_type").getStringValue() : "";
+                ZoneId zoneId = ZoneId.of("UTC");
+                LocalDateTime start_time = !row.get("start_time").isNull() ? row.get("start_time").getTimestampInstant().atZone(zoneId).toLocalDateTime() : null;
 //                int start_station_id = !row.get("start_station_id").isNull() ? row.get("start_station_id").getNumericValue().intValue() : 0;
-//                String start_station_name = !row.get("start_station_name").isNull() ? row.get("start_station_name").getStringValue() : "";
+                String start_station_name = !row.get("start_station_name").isNull() ? row.get("start_station_name").getStringValue() : "";
 //                String end_station_id = !row.get("end_station_id").isNull() ? row.get("end_station_id").getStringValue() : "";
-//                String end_station_name = !row.get("end_station_name").isNull() ? row.get("end_station_name").getStringValue() : "";
-//                int duration_minutes = !row.get("duration_minutes").isNull() ? row.get("duration_minutes").getNumericValue().intValue() : 0;
+                String end_station_name = !row.get("end_station_name").isNull() ? row.get("end_station_name").getStringValue() : "";
+                int duration_minutes = !row.get("duration_minutes").isNull() ? row.get("duration_minutes").getNumericValue().intValue() : 0;
 
-//                Trip trip = new Trip(trip_id, subscriber_type, bike_id, bike_type, start_time, start_station_id, start_station_name, end_station_id, end_station_name, duration_minutes);
-                Trip trip = new Trip(trip_id);
+                Trip trip = new Trip(trip_id, subscriber_type, bike_id, bike_type, start_time, start_station_name, end_station_name, duration_minutes);
                 trips.add(trip);
             }
 
@@ -84,5 +83,11 @@ public class TripService {
         tripHolder.setCount(trips.size());
         tripHolder.setStatus("Success");
         return tripHolder;
+    }
+
+    public String convertTime(String time) {
+        String modified = time.substring(0, 10) + ' ' + time.substring(11);
+        modified = modified.concat(":00");
+        return modified;
     }
 }

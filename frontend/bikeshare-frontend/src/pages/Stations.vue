@@ -64,6 +64,7 @@
             </div>
         </div>
     </div>
+    <v-snackbar v-model="snackbar" :timeout="timeout">{{ text }}</v-snackbar>
 </template>
 
 <script setup>
@@ -154,11 +155,15 @@ async function getStations() {
     })
         .then((response) => {
             stations.value = response.data.stations
-            console.log(param_max_footprint_width.value)
+            snackbar.value = true
         }).catch((error) => {
             console.log(error);
         })
 }
+
+const snackbar = ref(false)
+const text = ref("Query completed")
+const timeout = ref(2000)
 
 </script>
 
