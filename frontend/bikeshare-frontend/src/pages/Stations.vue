@@ -96,11 +96,11 @@ let max_length = ref(70)
 let min_width = ref(0.0)
 let max_width = ref(20.0)
 
-const param_name = ref()
-const param_status = ref()
-const param_address = ref()
-const param_property_type = ref()
-const param_power_type = ref()
+const param_name = ref("")
+const param_status = ref("")
+const param_address = ref("")
+const param_property_type = ref("")
+const param_power_type = ref("")
 
 let param_min_number_of_docks = ref()
 let param_max_number_of_docks = ref()
@@ -116,42 +116,40 @@ const width_value = ref([0, 20])
 async function getStations() {
     param_min_number_of_docks = computed(() => {
         const min = Math.min(...docks_value.value)
-        return min == min_dock.value? "" : min
+        return min == min_dock.value? 0 : min
     })
     param_max_number_of_docks = computed(() => {
         const max = Math.max(...docks_value.value)
-        return max == max_dock.value? "" : max
+        return max == max_dock.value? 0 : max
     })
     param_min_footprint_length = computed(() => {
         const min = Math.min(...length_value.value)
-        return min == min_length.value? "" : min
+        return min == min_length.value? 0 : min
     })
     param_max_footprint_length = computed(() => {
         const max = Math.max(...length_value.value)
-        return max == max_length.value? "" : max
+        return max == max_length.value? 0 : max
     })
     param_min_footprint_width = computed(() => {
         const min = Math.min(...width_value.value)
-        return min == min_width.value? "" : min
+        return min == min_width.value? 0 : min
     })
     param_max_footprint_width = computed(() => {
         const max = Math.max(...width_value.value)
-        return max == max_width.value? "" : max
+        return max == max_width.value? 0 : max
     })
-    await api.get(`/stations`, {
-        params: {
-            name: param_name.value,
-            address: param_address.value,
-            status: param_status.value,
-            property_type: param_property_type.value,
-            power_type: param_power_type.value,
-            min_number_of_docks: param_min_number_of_docks.value,
-            max_number_of_docks: param_max_number_of_docks.value,
-            min_footprint_length: param_min_footprint_length.value,
-            max_footprint_length: param_max_footprint_length.value,
-            min_footprint_width: param_min_footprint_width.value,
-            max_footprint_width: param_max_footprint_width.value,
-        }
+    await api.post(`/stations`, {
+                name: param_name.value,
+                address: param_address.value,
+                status: param_status.value,
+                property_type: param_property_type.value,
+                power_type: param_power_type.value,
+                min_docks: param_min_number_of_docks.value,
+                max_docks: param_max_number_of_docks.value,
+                min_length: param_min_footprint_length.value,
+                max_length: param_max_footprint_length.value,
+                min_width: param_min_footprint_width.value,
+                max_width: param_max_footprint_width.value,
     })
         .then((response) => {
             stations.value = response.data.stations

@@ -1,24 +1,25 @@
 package com.ducnh.bikeshare.service;
 
+import com.ducnh.bikeshare.constant.Constant;
+import com.ducnh.bikeshare.dto.TripParamDTO;
 import com.ducnh.bikeshare.model.Trip;
 import com.ducnh.bikeshare.model.TripHolder;
 import com.google.cloud.bigquery.*;
+import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
 import java.time.ZoneId;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 @Service
-public class TripService {
+public class TripService implements ITripService{
     private static final Logger log = LoggerFactory.getLogger(TripService.class);
 
-    public TripHolder getTrips(String query) {
+    @Override
+    public TripHolder getTrips(TripParamDTO params) {
         log.info("query started");
 
         TripHolder tripHolder = new TripHolder();
@@ -27,35 +28,30 @@ public class TripService {
         tripHolder.setStatus("Failed");
         tripHolder.setCount(0);
 
-        BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
+        String query = parsedQuery(params);
+        log.info(query);
 
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query)
-                .setUseLegacySql(false)
-                .build();
+        Job queryJob = StationService.createJob(query);
 
-        String jobIdStr = UUID.randomUUID().toString();
-        log.info("jobIdStr: {}", jobIdStr);
+        getResponseData(queryJob, tripHolder);
 
-        JobId jobId = JobId.of(jobIdStr);
+        return tripHolder;
+    }
 
-        Job queryJob = bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
-
+    private void getResponseData(Job queryJob, TripHolder tripHolder) {
         try {
             queryJob = queryJob.waitFor();
             if (queryJob == null) {
                 log.info("queryJob is null");
-                return tripHolder;
+                return;
             }
 
             if (queryJob.getStatus().getError() != null) {
                 log.info("queryJob status: {}", queryJob.getStatus().getError());
-                return tripHolder;
+                return;
             }
 
-//            TableResult result = queryJob.getQueryResults();
-            BigQuery.QueryResultsOption queryResultsOption = BigQuery.QueryResultsOption.pageSize(20);
-
-            TableResult result = queryJob.getQueryResults(queryResultsOption);
+            TableResult result = queryJob.getQueryResults();
 
             for (FieldValueList row : result.iterateAll()) {
                 String trip_id = !row.get("trip_id").isNull() ? row.get("trip_id").getStringValue() : "";
@@ -64,30 +60,46 @@ public class TripService {
                 String bike_type = !row.get("bike_type").isNull() ? row.get("bike_type").getStringValue() : "";
                 ZoneId zoneId = ZoneId.of("UTC");
                 LocalDateTime start_time = !row.get("start_time").isNull() ? row.get("start_time").getTimestampInstant().atZone(zoneId).toLocalDateTime() : null;
-//                int start_station_id = !row.get("start_station_id").isNull() ? row.get("start_station_id").getNumericValue().intValue() : 0;
                 String start_station_name = !row.get("start_station_name").isNull() ? row.get("start_station_name").getStringValue() : "";
-//                String end_station_id = !row.get("end_station_id").isNull() ? row.get("end_station_id").getStringValue() : "";
                 String end_station_name = !row.get("end_station_name").isNull() ? row.get("end_station_name").getStringValue() : "";
                 int duration_minutes = !row.get("duration_minutes").isNull() ? row.get("duration_minutes").getNumericValue().intValue() : 0;
 
                 Trip trip = new Trip(trip_id, subscriber_type, bike_id, bike_type, start_time, start_station_name, end_station_name, duration_minutes);
-                trips.add(trip);
+                tripHolder.getTrips().add(trip);
             }
 
         } catch (Exception e) {
             System.out.println(Arrays.toString(e.getStackTrace()));
             log.error("Error: {}", e.getMessage());
-            return tripHolder;
+            return;
         }
 
-        tripHolder.setCount(trips.size());
+        tripHolder.setCount(tripHolder.getTrips().size());
         tripHolder.setStatus("Success");
-        return tripHolder;
     }
 
     public String convertTime(String time) {
         String modified = time.substring(0, 10) + ' ' + time.substring(11);
         modified = modified.concat(":00");
         return modified;
+    }
+
+    private String parsedQuery(TripParamDTO params) {
+        return new SQL(){{
+            SELECT("trip_id, subscriber_type, bike_id, bike_type, start_time, start_station_name, end_station_name, duration_minutes");
+            FROM(Constant.TABLE_TRIPS);
+            if (!Objects.equals(params.getTrip_id(), "")) WHERE(String.format("REGEXP_CONTAINS(trip_id,r'(?i)%s')", params.getTrip_id()));
+            if (!Objects.equals(params.getSubscriber_type(), "")) WHERE(String.format("REGEXP_CONTAINS(subscriber_type,r'(?i)%s')", params.getSubscriber_type()));
+            if (!Objects.equals(params.getBike_id(), "")) WHERE(String.format("REGEXP_CONTAINS(bike_id,r'(?i)%s')", params.getBike_id()));
+            if (!Objects.equals(params.getStart_station_name(), "")) WHERE(String.format("REGEXP_CONTAINS(start_station_name,r'(?i)%s')", params.getStart_station_name()));
+            if (!Objects.equals(params.getEnd_station_name(), "")) WHERE(String.format("REGEXP_CONTAINS(end_station_name,r'(?i)%s')", params.getEnd_station_name()));
+            if (!Objects.equals(params.getBike_type(), "")) WHERE(String.format("bike_type = '%s'", params.getBike_type()));
+            if (params.getMin_duration() != 0) WHERE(String.format("duration_minutes >= %s", params.getMin_duration()));
+            if (params.getMax_duration() != 0) WHERE(String.format("duration_minutes <= %s", params.getMax_duration()));
+            if (!Objects.equals(params.getMin_start_time(), "")) WHERE(String.format("start_time >= TIMESTAMP('%s')", convertTime(params.getMin_start_time())));
+            if (!Objects.equals(params.getMax_start_time(), "")) WHERE(String.format("start_time <= TIMESTAMP('%s')", convertTime(params.getMax_start_time())));
+            LIMIT(200);
+            OFFSET(params.getOffset());
+        }}.toString();
     }
 }

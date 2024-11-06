@@ -8,11 +8,11 @@
                     <h3 class="title">Search</h3>
                 </div>
                 <div class="search-section">
-                    <v-number-input 
+                    <v-text-field 
                         label="Trip ID"
                         control-variant="stacked"
                         v-model="param_trip_id">
-                    </v-number-input>
+                    </v-text-field>
                     <v-text-field
                         label="Subscriber type"
                         v-model="param_subscriber_type">
@@ -22,11 +22,11 @@
                         <v-radio label="Classic" value="classic"></v-radio>
                         <v-radio label="Electric" value="electric"></v-radio>
                     </v-radio-group>
-                    <v-number-input
+                    <v-text-field 
                         label="Bike ID"
                         control-variant="stacked"
                         v-model="param_bike_id">
-                    </v-number-input>
+                    </v-text-field>
                     <v-text-field
                         label="Start station"
                         v-model="param_start_station_name">
@@ -105,16 +105,16 @@ const header = [
 
 const trips = ref()
 
-const param_trip_id = ref()
-const param_subscriber_type = ref()
-const param_bike_id = ref()
-const param_bike_type = ref()
-const param_start_station_name = ref()
-const param_end_station_name = ref()
-const param_min_duration = ref()
-const param_max_duration = ref()
-const param_min_start_time = ref()
-const param_max_start_time = ref()
+const param_trip_id = ref("")
+const param_subscriber_type = ref("")
+const param_bike_id = ref("")
+const param_bike_type = ref("")
+const param_start_station_name = ref("")
+const param_end_station_name = ref("")
+const param_min_duration = ref(0)
+const param_max_duration = ref(0)
+const param_min_start_time = ref("")
+const param_max_start_time = ref("")
 const offset = ref(0)
 
 const disable = ref(true)
@@ -123,19 +123,19 @@ const text = ref()
 const timeout = ref(2000)
 
 async function getTrips() {
-    await api.get(`/trips`, {
-        params: {
-            trip_id: param_trip_id.value,
-            subscriber_type: param_subscriber_type.value,
-            bike_id: param_bike_id.value,
-            bike_type: param_bike_type.value,
-            start_station_name: param_start_station_name.value,
-            end_station_name: param_end_station_name.value,
-            min_duration_minutes: param_min_duration.value,
-            max_duration_minutes: param_max_duration.value,
-            min_start_time: param_min_start_time.value,
-            max_start_time: param_max_start_time.value,
-        }
+    offset.value = 0
+    await api.post(`/trips`, {
+        offset: offset.value,
+        trip_id: param_trip_id.value,
+        subscriber_type: param_subscriber_type.value,
+        bike_id: param_bike_id.value,
+        bike_type: param_bike_type.value,
+        start_station_name: param_start_station_name.value,
+        end_station_name: param_end_station_name.value,
+        min_duration: param_min_duration.value,
+        max_duration: param_max_duration.value,
+        min_start_time: param_min_start_time.value,
+        max_start_time: param_max_start_time.value,
     })
         .then((response) => {
             trips.value = response.data.trips
@@ -153,20 +153,18 @@ async function getTrips() {
 
 async function loadMore() {
     offset.value += 200;
-    await api.get(`/trips`, {
-        params: {
-            offset: offset.value,
-            trip_id: param_trip_id.value,
-            subscriber_type: param_subscriber_type.value,
-            bike_id: param_bike_id.value,
-            bike_type: param_bike_type.value,
-            start_station_name: param_start_station_name.value,
-            end_station_name: param_end_station_name.value,
-            min_duration_minutes: param_min_duration.value,
-            max_duration_minutes: param_max_duration.value,
-            min_start_time: param_min_start_time.value,
-            max_start_time: param_max_start_time.value,
-        }
+    await api.post(`/trips`, {
+        offset: offset.value,
+        trip_id: param_trip_id.value,
+        subscriber_type: param_subscriber_type.value,
+        bike_id: param_bike_id.value,
+        bike_type: param_bike_type.value,
+        start_station_name: param_start_station_name.value,
+        end_station_name: param_end_station_name.value,
+        min_duration: param_min_duration.value,
+        max_duration: param_max_duration.value,
+        min_start_time: param_min_start_time.value,
+        max_start_time: param_max_start_time.value,
     })
         .then((response) => {
             response.data.trips.forEach((trip) => {

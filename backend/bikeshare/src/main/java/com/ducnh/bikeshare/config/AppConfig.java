@@ -1,5 +1,6 @@
 package com.ducnh.bikeshare.config;
 
+import com.ducnh.bikeshare.constant.Constant;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.web.cors.CorsConfiguration;
@@ -11,7 +12,7 @@ public class AppConfig {
     @Bean
     public CorsFilter corsFilter() {
         CorsConfiguration config = new CorsConfiguration();
-        config.addAllowedOrigin("http://localhost:3000");
+        config.addAllowedOrigin(Constant.FRONTEND_URL);
         config.addAllowedMethod("*");
         config.addAllowedHeader("*");
 
