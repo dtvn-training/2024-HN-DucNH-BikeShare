@@ -7,6 +7,6 @@ import java.io.IOException;
 
 @Service
 public interface IExportService {
-    public void exportQueryResult(String json, HttpServletResponse response) throws IOException;
-    public void setResponseHeader(HttpServletResponse response, String table);
+    void exportQueryResult(String json, HttpServletResponse response) throws IOException;
+    void setResponseHeader(HttpServletResponse response, String table);
 }

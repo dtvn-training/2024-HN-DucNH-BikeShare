@@ -5,14 +5,12 @@ import com.ducnh.bikeshare.dto.StationParamDTO;
 import com.ducnh.bikeshare.model.Station;
 import com.ducnh.bikeshare.model.StationHolder;
 import com.google.cloud.bigquery.*;
-import org.apache.ibatis.annotations.Param;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -32,26 +30,11 @@ public class StationService implements IStationService{
         String query = parsedQuery(params);
         log.info(query);
 
-        Job queryJob = createJob(query);
+        Job queryJob = TableService.createJob(query);
 
         getResponseData(queryJob, stationHolder);
 
         return stationHolder;
-    }
-
-    public static Job createJob(String query) {
-        BigQuery bigQuery = BigQueryOptions.getDefaultInstance().getService();
-
-        QueryJobConfiguration queryConfig = QueryJobConfiguration.newBuilder(query)
-                .setUseLegacySql(false)
-                .build();
-
-        String jobIdStr = UUID.randomUUID().toString();
-        log.info("jobIdStr: {}", jobIdStr);
-
-        JobId jobId = JobId.of(jobIdStr);
-
-        return bigQuery.create(JobInfo.newBuilder(queryConfig).setJobId(jobId).build());
     }
 
     private void getResponseData(Job queryJob, StationHolder stationHolder) {
@@ -70,22 +53,21 @@ public class StationService implements IStationService{
             TableResult result = queryJob.getQueryResults();
 
             for (FieldValueList row : result.iterateAll()) {
-                int station_id = !row.get("station_id").isNull() ? row.get("station_id").getNumericValue().intValue() : 0;
-                String name = !row.get("name").isNull() ? row.get("name").getStringValue() : "";
-                String status = !row.get("status").isNull() ? row.get("status").getStringValue() : "";
-                String location = !row.get("location").isNull() ? row.get("location").getStringValue() : "";
-                String address = !row.get("address").isNull() ? row.get("address").getStringValue() : "";
-                String alternate_name = !row.get("alternate_name").isNull() ? row.get("alternate_name").getStringValue() : "";
-                int city_asset_number = !row.get("city_asset_number").isNull() ? row.get("city_asset_number").getNumericValue().intValue() : 0;
-                String property_type = !row.get("property_type").isNull() ? row.get("property_type").getStringValue() : "";
-                int number_of_docks = !row.get("number_of_docks").isNull() ? row.get("number_of_docks").getNumericValue().intValue() : 0;
-                String power_type = !row.get("power_type").isNull() ? row.get("power_type").getStringValue() : "";
-                int footprint_length = !row.get("footprint_length").isNull() ? row.get("footprint_length").getNumericValue().intValue() : 0;
-                float footprint_width = !row.get("footprint_width").isNull() ? row.get("footprint_width").getNumericValue().floatValue() : 0f;
-                String notes = !row.get("notes").isNull() ? row.get("notes").getStringValue() : "";
-                int council_district = !row.get("council_district").isNull() ? row.get("council_district").getNumericValue().intValue() : 0;
-                ZoneId zoneId = ZoneId.of("UTC");
-                LocalDateTime modified_date = !row.get("modified_date").isNull() ? row.get("modified_date").getTimestampInstant().atZone(zoneId).toLocalDateTime() : null;
+                int station_id = TableService.validateInteger("station_id", row);
+                String name = TableService.validateString("name", row);
+                String status = TableService.validateString("status", row);
+                String location = TableService.validateString("location", row);
+                String address = TableService.validateString("address", row);
+                String alternate_name = TableService.validateString("alternate_name", row);
+                int city_asset_number = TableService.validateInteger("city_asset_number", row);
+                String property_type = TableService.validateString("property_type", row);
+                int number_of_docks = TableService.validateInteger("number_of_docks", row);
+                String power_type = TableService.validateString("power_type", row);
+                int footprint_length = TableService.validateInteger("footprint_length", row);
+                float footprint_width = TableService.validateFloat("footprint_length", row);
+                String notes = TableService.validateString("notes", row);
+                int council_district = TableService.validateInteger("council_district", row);
+                LocalDateTime modified_date = TableService.validateTime("modified_date", row);
 
                 Station station = new Station(station_id, name, status, location, address, alternate_name, city_asset_number, property_type, number_of_docks, power_type, footprint_length,
                         footprint_width, notes, council_district, modified_date);

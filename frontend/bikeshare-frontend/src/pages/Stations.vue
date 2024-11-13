@@ -68,7 +68,7 @@
 
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
-import { ref, computed, reactive } from 'vue';
+import { ref, computed } from 'vue';
 import api from '@/config/api';
 
 const header = [

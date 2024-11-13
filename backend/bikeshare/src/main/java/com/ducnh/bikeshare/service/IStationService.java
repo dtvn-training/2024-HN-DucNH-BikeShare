@@ -6,5 +6,5 @@ import org.springframework.stereotype.Service;
 
 @Service
 public interface IStationService {
-    public StationHolder getStations(StationParamDTO params);
+    StationHolder getStations(StationParamDTO params);
 }

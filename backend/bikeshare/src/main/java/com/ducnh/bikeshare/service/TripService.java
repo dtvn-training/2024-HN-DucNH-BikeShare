@@ -11,7 +11,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDateTime;
-import java.time.ZoneId;
 import java.util.*;
 
 @Service
@@ -31,7 +30,7 @@ public class TripService implements ITripService{
         String query = parsedQuery(params);
         log.info(query);
 
-        Job queryJob = StationService.createJob(query);
+        Job queryJob = TableService.createJob(query);
 
         getResponseData(queryJob, tripHolder);
 
@@ -54,15 +53,14 @@ public class TripService implements ITripService{
             TableResult result = queryJob.getQueryResults();
 
             for (FieldValueList row : result.iterateAll()) {
-                String trip_id = !row.get("trip_id").isNull() ? row.get("trip_id").getStringValue() : "";
-                String subscriber_type = !row.get("subscriber_type").isNull() ? row.get("subscriber_type").getStringValue() : "";
-                String bike_id = !row.get("bike_id").isNull() ? row.get("bike_id").getStringValue() : "";
-                String bike_type = !row.get("bike_type").isNull() ? row.get("bike_type").getStringValue() : "";
-                ZoneId zoneId = ZoneId.of("UTC");
-                LocalDateTime start_time = !row.get("start_time").isNull() ? row.get("start_time").getTimestampInstant().atZone(zoneId).toLocalDateTime() : null;
-                String start_station_name = !row.get("start_station_name").isNull() ? row.get("start_station_name").getStringValue() : "";
-                String end_station_name = !row.get("end_station_name").isNull() ? row.get("end_station_name").getStringValue() : "";
-                int duration_minutes = !row.get("duration_minutes").isNull() ? row.get("duration_minutes").getNumericValue().intValue() : 0;
+                String trip_id = TableService.validateString("trip_id", row);
+                String subscriber_type = TableService.validateString("subscriber_type", row);
+                String bike_id = TableService.validateString("bike_id", row);
+                String bike_type = TableService.validateString("bike_type", row);
+                LocalDateTime start_time = TableService.validateTime("start_time", row);
+                String start_station_name = TableService.validateString("start_station_name", row);
+                String end_station_name = TableService.validateString("end_station_name", row);
+                int duration_minutes = TableService.validateInteger("duration_minutes", row);
 
                 Trip trip = new Trip(trip_id, subscriber_type, bike_id, bike_type, start_time, start_station_name, end_station_name, duration_minutes);
                 tripHolder.getTrips().add(trip);
@@ -79,7 +77,8 @@ public class TripService implements ITripService{
     }
 
     public String convertTime(String time) {
-        String modified = time.substring(0, 10) + ' ' + time.substring(11);
+        // From yyyy-mm-ddThh:mm:ss to yyyy-mm-dd hh:mm
+        String modified = time.replace("T", "");
         modified = modified.concat(":00");
         return modified;
     }
