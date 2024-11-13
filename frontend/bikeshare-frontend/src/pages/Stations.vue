@@ -53,10 +53,9 @@
         <div class="col w-2">
             <div class="table-content">
                 <div class="table-header">
-                    <!-- <v-pagination length="5"></v-pagination> -->
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
-                        <v-btn variant="outlined" class="btn">Export</v-btn>
+                        <v-btn variant="outlined" class="btn" @click="downloadExcel">Export</v-btn>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="stations">
@@ -69,7 +68,7 @@
 
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
-import { ref, computed } from 'vue';
+import { ref, computed, reactive } from 'vue';
 import api from '@/config/api';
 
 const header = [
@@ -139,24 +138,55 @@ async function getStations() {
         return max == max_width.value? 0 : max
     })
     await api.post(`/stations`, {
-                name: param_name.value,
-                address: param_address.value,
-                status: param_status.value,
-                property_type: param_property_type.value,
-                power_type: param_power_type.value,
-                min_docks: param_min_number_of_docks.value,
-                max_docks: param_max_number_of_docks.value,
-                min_length: param_min_footprint_length.value,
-                max_length: param_max_footprint_length.value,
-                min_width: param_min_footprint_width.value,
-                max_width: param_max_footprint_width.value,
+        name: param_name.value,
+        address: param_address.value,
+        status: param_status.value,
+        property_type: param_property_type.value,
+        power_type: param_power_type.value,
+        min_docks: param_min_number_of_docks.value,
+        max_docks: param_max_number_of_docks.value,
+        min_length: param_min_footprint_length.value,
+        max_length: param_max_footprint_length.value,
+        min_width: param_min_footprint_width.value,
+        max_width: param_max_footprint_width.value,
     })
         .then((response) => {
             stations.value = response.data.stations
+            json.value = JSON.stringify(response.data)
             snackbar.value = true
+            console.log(JSON.stringify(response.data))
         }).catch((error) => {
             console.log(error);
         })
+}
+
+const json = ref()
+
+async function downloadExcel() {
+    try {
+        const response = await api.post(`/export`, {
+            json: json.value
+        }, {
+            responseType: 'blob',
+            headers: {
+            'Content-Type': 'application/json'
+            }
+        });
+
+        const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', 'Stations.xlsx');
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Download failed:', error);
+    }
 }
 
 const snackbar = ref(false)
