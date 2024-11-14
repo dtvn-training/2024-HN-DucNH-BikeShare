@@ -29,7 +29,7 @@
                     <v-radio-group inline label="Power type" v-model="param_power_type">
                         <v-radio label="Any" value=""></v-radio>
                         <v-radio label="Solar" value="solar"></v-radio>
-                        <v-radio label="Non-metered" value="non_metered"></v-radio>
+                        <v-radio label="Non-metered" value="non-metered"></v-radio>
                     </v-radio-group>
                     <v-range-slider label="Number of docks"
                                     v-model="docks_value"
@@ -164,7 +164,7 @@ const json = ref()
 
 async function downloadExcel() {
     try {
-        const response = await api.post(`/export`, {
+        const response = await api.post(`/export/stations`, {
             json: json.value
         }, {
             responseType: 'blob',
@@ -176,10 +176,14 @@ async function downloadExcel() {
         const blob = new Blob([response.data], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
         });
+
+        const date = new Date();
+        const name = `Stations_${date.getFullYear()}_${date.getMonth() + 1}_${date.getDate()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.xlsx`;
+
         const url = window.URL.createObjectURL(blob);
         const link = document.createElement('a');
         link.href = url;
-        link.setAttribute('download', 'Stations.xlsx');
+        link.setAttribute('download', name);
         document.body.appendChild(link);
         link.click();
         window.URL.revokeObjectURL(url);

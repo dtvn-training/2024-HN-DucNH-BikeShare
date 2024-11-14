@@ -78,7 +78,7 @@ public class TripService implements ITripService{
 
     public String convertTime(String time) {
         // From yyyy-mm-ddThh:mm:ss to yyyy-mm-dd hh:mm
-        String modified = time.replace("T", "");
+        String modified = time.replace("T", " ");
         modified = modified.concat(":00");
         return modified;
     }
@@ -97,8 +97,10 @@ public class TripService implements ITripService{
             if (params.getMax_duration() != 0) WHERE(String.format("duration_minutes <= %s", params.getMax_duration()));
             if (!Objects.equals(params.getMin_start_time(), "")) WHERE(String.format("start_time >= TIMESTAMP('%s')", convertTime(params.getMin_start_time())));
             if (!Objects.equals(params.getMax_start_time(), "")) WHERE(String.format("start_time <= TIMESTAMP('%s')", convertTime(params.getMax_start_time())));
-            LIMIT(200);
-            OFFSET(params.getOffset());
+            if (params.getLimit() != 0) {
+                LIMIT(params.getLimit());
+                OFFSET(params.getOffset());
+            }
         }}.toString();
     }
 }

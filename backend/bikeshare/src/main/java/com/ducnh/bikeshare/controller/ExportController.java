@@ -17,9 +17,11 @@ public class ExportController {
     @Autowired
     ExportService exportService;
 
-    @PostMapping()
-    public void export(@RequestBody String json, HttpServletResponse response) throws IOException {
+    @PostMapping("/{table}")
+    public void export(@RequestBody String json,
+                       @PathVariable String table,
+                       HttpServletResponse response) throws IOException {
         json = exportService.editJSONInput(json);
-        exportService.exportQueryResult(json, response);
+        exportService.exportQueryResult(json, response, table);
     }
 }

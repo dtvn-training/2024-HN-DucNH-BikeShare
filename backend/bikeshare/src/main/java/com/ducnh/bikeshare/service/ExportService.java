@@ -16,14 +16,12 @@ import static org.apache.poi.xssf.streaming.SXSSFWorkbook.DEFAULT_WINDOW_SIZE;
 
 @Service
 public class ExportService implements IExportService{
-    private static final String CONTENT_TYPE = "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet";
 
     @Override
-    public void exportQueryResult(String json, HttpServletResponse response) throws IOException {
+    public void exportQueryResult(String json, HttpServletResponse response, String table) throws IOException {
         try (SXSSFWorkbook workbook = new SXSSFWorkbook(DEFAULT_WINDOW_SIZE)) {
             Sheet sheet = workbook.createSheet();
 
-            setResponseHeader(response, "Stations");
             JsonNode jsonArray = readJsonFile(json);
 
             if (jsonArray == null) {
@@ -31,8 +29,8 @@ public class ExportService implements IExportService{
             }
 
             try (ServletOutputStream outStream = response.getOutputStream()) {
-                createHeaderRow(sheet, jsonArray);
-                addDataRows(sheet, jsonArray);
+                createHeaderRow(sheet, jsonArray, table);
+                addDataRows(sheet, jsonArray, table);
                 workbook.write(outStream);
                 workbook.dispose();
             } catch (Exception e) {
@@ -51,12 +49,12 @@ public class ExportService implements IExportService{
         }
     }
 
-    private void createHeaderRow(Sheet sheet, JsonNode jsonArray) {
+    private void createHeaderRow(Sheet sheet, JsonNode jsonArray, String table) {
         if (jsonArray == null || jsonArray.isEmpty()) {
             return;
         }
 
-        JsonNode stations = jsonArray.get("stations");
+        JsonNode stations = jsonArray.get(table);
 
         if (stations == null || stations.isEmpty()) {
             return;
@@ -74,13 +72,13 @@ public class ExportService implements IExportService{
         }
     }
 
-    private void addDataRows(Sheet sheet, JsonNode jsonArray) throws IOException {
+    private void addDataRows(Sheet sheet, JsonNode jsonArray, String table) throws IOException {
         if (jsonArray == null) {
             throw new IOException("Error");
         }
 
         int count = jsonArray.get("count").asInt();
-        JsonNode stations = jsonArray.get("stations");
+        JsonNode stations = jsonArray.get(table);
 
         for (int i = 0; i < count; i++) {
             JsonNode jsonObject = stations.get(i);
@@ -124,14 +122,6 @@ public class ExportService implements IExportService{
         } catch (NumberFormatException e) {
             cell.setCellValue(stringValue);
         }
-    }
-
-    @Override
-    public void setResponseHeader(HttpServletResponse response, String table) {
-        String fileName = table + ".xlsx";
-        response.setContentType(CONTENT_TYPE);
-        response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-        response.setHeader("Expires", "0");
     }
 
     public String editJSONInput(String json) {

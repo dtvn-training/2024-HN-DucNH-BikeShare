@@ -62,7 +62,7 @@
                 
                 </div>
                 <div class="center">
-                    <v-btn variant="outlined" class="btn" @click="getTrips">Search</v-btn>
+                    <v-btn variant="outlined" class="btn" @click="getTrips(OFFSET)">Search</v-btn>
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
                 <div class="table-header">
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
-                        <v-btn variant="outlined" class="btn">Export</v-btn>
+                        <v-btn variant="outlined" class="btn" @click="downloadExcel">Export</v-btn>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="trips">
@@ -90,6 +90,8 @@ import AppHeader from '@/components/AppHeader.vue';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
 import { ref } from 'vue';
 import api from '@/config/api';
+
+const OFFSET = 400
 
 const header = [
     { title: 'Trip ID', key: 'trip_id', sortable: false },
@@ -122,9 +124,16 @@ const snackbar = ref(false)
 const text = ref()
 const timeout = ref(2000)
 
-async function getTrips() {
+function openSnackbar(content) {
+    text.value = content
+    snackbar.value = true
+}
+
+async function getTrips(limit) {
     offset.value = 0
+    openSnackbar("Querying...")
     await api.post(`/trips`, {
+        limit: OFFSET,
         offset: offset.value,
         trip_id: param_trip_id.value,
         subscriber_type: param_subscriber_type.value,
@@ -139,10 +148,10 @@ async function getTrips() {
     })
         .then((response) => {
             trips.value = response.data.trips
-            text.value = "Query completed"
-            snackbar.value = true
+            json.value = JSON.stringify(response.data)
+            openSnackbar("Query completed")
 
-            if(trips.value.length % 200 != 0 || trips.value.length == 0) {
+            if(trips.value.length % OFFSET != 0 || trips.value.length == 0) {
                 disable.value = true
             } else disable.value = false
         })
@@ -152,8 +161,9 @@ async function getTrips() {
 }
 
 async function loadMore() {
-    offset.value += 200;
+    offset.value += OFFSET;
     await api.post(`/trips`, {
+        limit: OFFSET,
         offset: offset.value,
         trip_id: param_trip_id.value,
         subscriber_type: param_subscriber_type.value,
@@ -171,13 +181,50 @@ async function loadMore() {
                 trips.value.push(trip)
             })
             
-            if(trips.value.length % 200 != 0) {
+            if(trips.value.length % OFFSET != 0) {
                 disable.value = true
             }
 
-            text.value = "More rows loaded"
-            snackbar.value = true
+            // response.data.forEach((trip) => {
+            //     json.value.push(JSON.stringify(trip))
+            // })
+            json.value.push(JSON.stringify(response.data))
+
+            openSnackbar("Loaded more rows")
         })
+}
+
+const json = ref()
+
+async function downloadExcel() {
+    try {
+        const response = await api.post(`/export/trips`, {
+            json: json.value
+        }, {
+            responseType: 'blob',
+            headers: {
+                'Content-Type': 'application/json'
+            }
+        });
+
+        const blob = new Blob([response.data], {
+            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+        });
+
+        const date = new Date();
+        const name = `Trips_${date.getFullYear()}_${date.getMonth() + 1}_${date.getDate()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.xlsx`;
+
+        const url = window.URL.createObjectURL(blob);
+        const link = document.createElement('a');
+        link.href = url;
+        link.setAttribute('download', name);
+        document.body.appendChild(link);
+        link.click();
+        window.URL.revokeObjectURL(url);
+        document.body.removeChild(link);
+    } catch (error) {
+        console.error('Download failed:', error);
+    }
 }
 </script>
 

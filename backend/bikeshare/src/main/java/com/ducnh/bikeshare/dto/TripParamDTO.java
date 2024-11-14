@@ -10,6 +10,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @Builder
 public class TripParamDTO {
+    private int limit;
     private int offset;
     private String trip_id;
     private String subscriber_type;
