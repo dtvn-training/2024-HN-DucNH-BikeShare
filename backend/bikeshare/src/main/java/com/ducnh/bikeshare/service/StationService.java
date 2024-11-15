@@ -64,7 +64,7 @@ public class StationService implements IStationService{
                 int number_of_docks = TableService.validateInteger("number_of_docks", row);
                 String power_type = TableService.validateString("power_type", row);
                 int footprint_length = TableService.validateInteger("footprint_length", row);
-                float footprint_width = TableService.validateFloat("footprint_length", row);
+                float footprint_width = TableService.validateFloat("footprint_width", row);
                 String notes = TableService.validateString("notes", row);
                 int council_district = TableService.validateInteger("council_district", row);
                 LocalDateTime modified_date = TableService.validateTime("modified_date", row);
