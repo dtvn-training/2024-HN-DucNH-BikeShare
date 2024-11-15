@@ -7,15 +7,72 @@ import jakarta.servlet.http.HttpServletResponse;
 import org.apache.poi.ss.usermodel.*;
 import org.apache.poi.xssf.streaming.SXSSFWorkbook;
 import org.springframework.stereotype.Service;
+
 import java.io.IOException;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.Map;
+import java.lang.reflect.Field;
+import java.util.*;
 
 import static org.apache.poi.xssf.streaming.SXSSFWorkbook.DEFAULT_WINDOW_SIZE;
 
 @Service
 public class ExportService implements IExportService{
+
+    // Functions for exporting excel directly from BigQuery
+
+    @Override
+    public <P> void exportToExcel(List<P> data, HttpServletResponse response) throws IOException{
+        if (data == null || data.isEmpty()) {
+            throw new IOException("Empty");
+        }
+
+        try (SXSSFWorkbook workbook = new SXSSFWorkbook(DEFAULT_WINDOW_SIZE)) {
+            Sheet sheet = workbook.createSheet();
+
+            Class<?> aClass = data.get(0).getClass();
+            Field[] fields = aClass.getDeclaredFields();
+
+            createHeaderRow(sheet, fields);
+            addDataRows(data, sheet, fields);
+
+            try (ServletOutputStream outStream = response.getOutputStream()) {
+                workbook.write(outStream);
+                workbook.dispose();
+            } catch (Exception e) {
+                throw new IOException(e.getMessage());
+            }
+        } catch (IOException e) {
+            throw new IOException(e.getMessage());
+        }
+    }
+
+    private void createHeaderRow(Sheet sheet, Field[] fields) {
+        Row headerRow = sheet.createRow(0);
+        for (int i = 0; i < fields.length; i++) {
+            Cell cell = headerRow.createCell(i);
+            cell.setCellValue(fields[i].getName());
+        }
+    }
+
+    private <T> void addDataRows(List<T> data, Sheet sheet, Field[] fields) {
+        int rowNum = 1;
+        for (T item : data) {
+            Row row = sheet.createRow(rowNum++);
+            for (int i = 0; i < fields.length; i++) {
+                Cell cell = row.createCell(i);
+                Field field = fields[i];
+                field.setAccessible(true);
+                try {
+                    Object value = field.get(item);
+                    setCellValue(cell, value);
+                } catch (IllegalAccessException e) {
+                    cell.setCellValue("");
+                }
+            }
+        }
+    }
+
+
+    // Functions for exporting excel from frontend response in JSON type
 
     @Override
     public void exportQueryResult(String json, HttpServletResponse response, String table) throws IOException {

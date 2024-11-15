@@ -62,7 +62,7 @@
                 
                 </div>
                 <div class="center">
-                    <v-btn variant="outlined" class="btn" @click="getTrips(OFFSET)">Search</v-btn>
+                    <v-btn variant="outlined" class="btn" @click="getTrips">Search</v-btn>
                 </div>
             </div>
         </div>
@@ -72,7 +72,7 @@
                 <div class="table-header">
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
-                        <ExportButton :table="table" :json="json"></ExportButton>
+                        <v-btn variant="outlined" class="btn" @click="exportFullResult">Export</v-btn>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="trips">
@@ -130,11 +130,13 @@ function openSnackbar(content) {
     snackbar.value = true
 }
 
-async function getTrips(limit) {
+
+// Query trips info with limited number of rows
+async function getTrips() {
     offset.value = 0
     openSnackbar("Querying...")
     await api.post(`/trips`, {
-        limit: 0,
+        limit: OFFSET,
         offset: offset.value,
         trip_id: param_trip_id.value,
         subscriber_type: param_subscriber_type.value,
@@ -161,6 +163,7 @@ async function getTrips(limit) {
         })
 }
 
+// Load more same amount of rows as first query
 async function loadMore() {
     offset.value += OFFSET;
     await api.post(`/trips`, {
@@ -186,27 +189,35 @@ async function loadMore() {
                 disable.value = true
             }
 
-            // response.data.forEach((trip) => {
-            //     json.value.push(JSON.stringify(trip))
-            // })
-            json.value.push(JSON.stringify(response.data))
-
             openSnackbar("Loaded more rows")
         })
 }
 
 const json = ref()
 
-async function downloadExcel() {
+// Export all trips (no limited number of rows)
+async function exportFullResult() {
+    openSnackbar("Exporting...")
     try {
-        const response = await api.post(`/export/trips`, {
-            json: json.value
+        const response = await api.post(`/export/trips/getAll`, {
+            limit: 0,
+            offset: 0,
+            trip_id: param_trip_id.value,
+            subscriber_type: param_subscriber_type.value,
+            bike_id: param_bike_id.value,
+            bike_type: param_bike_type.value,
+            start_station_name: param_start_station_name.value,
+            end_station_name: param_end_station_name.value,
+            min_duration: param_min_duration.value,
+            max_duration: param_max_duration.value,
+            min_start_time: param_min_start_time.value,
+            max_start_time: param_max_start_time.value,
         }, {
             responseType: 'blob',
             headers: {
                 'Content-Type': 'application/json'
             }
-        });
+        })
 
         const blob = new Blob([response.data], {
             type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
@@ -227,6 +238,8 @@ async function downloadExcel() {
         console.error('Download failed:', error);
     }
 }
+
+
 </script>
 
 <style>
