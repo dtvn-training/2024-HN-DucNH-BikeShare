@@ -55,7 +55,7 @@
                 <div class="table-header">
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
-                        <v-btn variant="outlined" class="btn" @click="downloadExcel">Export</v-btn>
+                        <ExportButton :table="table" :json="json"></ExportButton>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="stations">
@@ -70,6 +70,9 @@
 import AppHeader from '@/components/AppHeader.vue';
 import { ref, computed } from 'vue';
 import api from '@/config/api';
+import ExportButton from '@/components/ExportButton.vue';
+
+const table = ref('stations')
 
 const header = [
     { title: 'Name', key: 'name', sortable: false },
@@ -112,7 +115,13 @@ const docks_value = ref([0, 30])
 const length_value = ref([0, 70])
 const width_value = ref([0, 20])
 
+function openSnackbar(content) {
+    text.value = content
+    snackbar.value = true
+}
+
 async function getStations() {
+    openSnackbar("Querying...")
     param_min_number_of_docks = computed(() => {
         const min = Math.min(...docks_value.value)
         return min == min_dock.value? 0 : min
@@ -153,48 +162,15 @@ async function getStations() {
         .then((response) => {
             stations.value = response.data.stations
             json.value = JSON.stringify(response.data)
-            snackbar.value = true
-            console.log(JSON.stringify(response.data))
+            openSnackbar("Query completed")
         }).catch((error) => {
             console.log(error);
         })
 }
 
 const json = ref()
-
-async function downloadExcel() {
-    try {
-        const response = await api.post(`/export/stations`, {
-            json: json.value
-        }, {
-            responseType: 'blob',
-            headers: {
-            'Content-Type': 'application/json'
-            }
-        });
-
-        const blob = new Blob([response.data], {
-            type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
-        });
-
-        const date = new Date();
-        const name = `Stations_${date.getFullYear()}_${date.getMonth() + 1}_${date.getDate()}_${date.getHours()}_${date.getMinutes()}_${date.getSeconds()}.xlsx`;
-
-        const url = window.URL.createObjectURL(blob);
-        const link = document.createElement('a');
-        link.href = url;
-        link.setAttribute('download', name);
-        document.body.appendChild(link);
-        link.click();
-        window.URL.revokeObjectURL(url);
-        document.body.removeChild(link);
-    } catch (error) {
-        console.error('Download failed:', error);
-    }
-}
-
 const snackbar = ref(false)
-const text = ref("Query completed")
+const text = ref()
 const timeout = ref(2000)
 
 </script>

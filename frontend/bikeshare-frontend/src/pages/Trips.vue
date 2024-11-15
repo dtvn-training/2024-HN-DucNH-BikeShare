@@ -72,7 +72,7 @@
                 <div class="table-header">
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
-                        <v-btn variant="outlined" class="btn" @click="downloadExcel">Export</v-btn>
+                        <ExportButton :table="table" :json="json"></ExportButton>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="trips">
@@ -90,8 +90,10 @@ import AppHeader from '@/components/AppHeader.vue';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
 import { ref } from 'vue';
 import api from '@/config/api';
+import ExportButton from '@/components/ExportButton.vue';
 
 const OFFSET = 400
+const table = ref('trips')
 
 const header = [
     { title: 'Trip ID', key: 'trip_id', sortable: false },
@@ -103,7 +105,6 @@ const header = [
     { title: 'End station', key: 'end_station_name', sortable: false },
     { title: 'Duration (minutes)', key: 'duration_minutes', sortable: false },
 ]
-
 
 const trips = ref()
 
@@ -133,7 +134,7 @@ async function getTrips(limit) {
     offset.value = 0
     openSnackbar("Querying...")
     await api.post(`/trips`, {
-        limit: OFFSET,
+        limit: 0,
         offset: offset.value,
         trip_id: param_trip_id.value,
         subscriber_type: param_subscriber_type.value,
