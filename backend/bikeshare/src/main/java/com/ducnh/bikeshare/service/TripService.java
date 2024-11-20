@@ -83,7 +83,7 @@ public class TripService implements ITripService{
         return modified;
     }
 
-    private String parsedQuery(TripParamDTO params) {
+    public String parsedQuery(TripParamDTO params) {
         return new SQL(){{
             SELECT("trip_id, subscriber_type, bike_id, bike_type, start_time, start_station_name, end_station_name, duration_minutes");
             FROM(Constant.TABLE_TRIPS);

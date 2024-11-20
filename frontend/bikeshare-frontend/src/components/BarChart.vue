@@ -1,32 +1,47 @@
 <template>
-    <Bar
-      id="my-chart-id"
-      :options="chartOptions"
-      :data="chartData"
-      style="height: 100px;"
-    />
+  <div>
+    <Bar :data="data1" :options="options" />
+  </div>
 </template>
 
-<script>
+<script setup>
 import { Bar } from 'vue-chartjs'
-import { Chart as ChartJS, Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale } from 'chart.js';
+import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js'
 
-ChartJS.register(Title, Tooltip, Legend, BarElement, CategoryScale, LinearScale)
+ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
-export default {
-    name: 'BarChart',
-    components: { Bar },
-    data() {
-        return {
-            chartData: {
-                labels: [ 'January', 'February', 'March' ],
-                datasets: [ { data: [40, 20, 12] } ]
-            },
-            chartOptions: {
-                responsive: true,
-                maintainAspectRatio: false
-            }
+const props = defineProps({
+    names: Array,
+    amounts: Array,
+    legend: String,
+    title: String
+})
+
+
+const data1 = {
+    labels: props.names,
+    datasets: [
+        {
+            label: props.legend,
+            backgroundColor: '#f87979',
+            data: props.amounts
         }
+    ]
+}
+
+const options = {
+  responsive: true,
+  maintainAspectRatio: false,
+  plugins: {
+        legend: {position: 'top',},
+        title: {display: true, text: props.title},
     }
 }
 </script>
+
+<style scoped>
+div {
+  height: 700px;
+  width: 100%;
+}
+</style>

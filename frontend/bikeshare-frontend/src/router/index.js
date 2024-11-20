@@ -10,9 +10,26 @@ import { setupLayouts } from 'virtual:generated-layouts'
 import { routes } from 'vue-router/auto-routes'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
-  routes: setupLayouts(routes),
+  history: createWebHistory(),
+  routes: [
+    {
+      path: '/stations',
+      name: 'Stations',
+      component: () => import('@/pages/Stations.vue')
+    },
+    {
+      path: '/trips',
+      name: 'Trips',
+      component: () => import('@/pages/Trips.vue')
+    },
+    {
+      path: '/charts',
+      name: 'Charts',
+      component: () => import('@/pages/Charts.vue')
+    }
+  ]
 })
+export default router
 
 // Workaround for https://github.com/vitejs/vite/issues/11804
 router.onError((err, to) => {
@@ -33,4 +50,4 @@ router.isReady().then(() => {
   localStorage.removeItem('vuetify:dynamic-reload')
 })
 
-export default router
+// export default router

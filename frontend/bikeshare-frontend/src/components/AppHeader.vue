@@ -7,7 +7,7 @@
         <v-btn variant="outlined" class="btn" href="/trips">Trips</v-btn>
     </div>
     <div>
-        <h2 class="title">{{ route.name.substring(1) }}</h2>
+        <h2 class="title">{{ route.name }}</h2>
     </div>
 </template>
 
