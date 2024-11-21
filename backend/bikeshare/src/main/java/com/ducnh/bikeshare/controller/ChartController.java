@@ -29,4 +29,14 @@ public class ChartController {
     public ChartHolder getTop10MostEndStations(@RequestBody TripParamDTO params) {
         return chartService.getChartData(tripService.parsedQuery(params), "Top 10 End Stations");
     }
+
+    @PostMapping("/subscriber_type")
+    public ChartHolder getSubscriberTypes(@RequestBody TripParamDTO params) {
+        return chartService.getChartData(tripService.parsedQuery(params), "Subscriber Types");
+    }
+
+    @PostMapping("/duration")
+    public ChartHolder getDuration(@RequestBody TripParamDTO params) {
+        return chartService.getChartData(tripService.parsedQuery(params), "Duration");
+    }
 }

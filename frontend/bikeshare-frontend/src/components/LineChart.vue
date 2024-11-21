@@ -1,46 +1,42 @@
 <template>
     <div class="chart-container">
-        <Pie :data="data1" :options="options" class="chart"/>
+        <Line :data="data1" :options="options" class="chart"/>
     </div>
 </template>
 
 <script setup>
-import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js'
-import { Pie } from 'vue-chartjs'
+import { Line } from 'vue-chartjs';
+import { Chart as ChartJS, CategoryScale, LinearScale, PointElement, LineElement, Title, Tooltip, Legend } from 'chart.js'
 
-ChartJS.register(ArcElement, Tooltip, Legend)
+ChartJS.register(CategoryScale, LinearScale, Title, Tooltip, Legend, PointElement, LineElement);
 
 const props = defineProps({
     names: Array,
     amounts: Array,
     legend: String,
     title: String
-})
+});
 
 const data1 = computed(() => ({
     labels: props.names,
     datasets: [
         {
             label: props.legend,
-            backgroundColor: ['#41B883', '#E46651', '#00D8FF', '#DD1B16', '#554851', '#dcb6f0', '#f0b6b6', '#b6f0d4', '#b6b6f0', '#f0b6f0'],
-            data: props.amounts
+            backgroundColor: '#dcb6f0',
+            data: props.amounts,
+            tension: 0
         }
     ]
-}))
+}));
 
 const options = {
     responsive: true,
     maintainAspectRatio: false,
     plugins: {
-        legend: {
-            position: 'top',
-        },
-        title: {
-            display: true,
-            text: props.title,
-        }
+        legend: {position: 'top',},
+        title: {display: true, text: props.title},
     }
-}
+};
 </script>
 
 <style>

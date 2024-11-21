@@ -71,12 +71,8 @@
             <div class="table-content">
                 <div class="table-header">
                     <div class="button-group">
-                        <v-btn variant="outlined" class="btn" href="/charts" @click="fetchData">Charts</v-btn>
-                        <!-- <BarChart :jsonData="chart_data"></BarChart> -->
+                        <v-btn variant="outlined" class="btn" @click="navigateToChart">Charts</v-btn>
                         <v-btn variant="outlined" class="btn" @click="exportFullResult">Export</v-btn>
-                        <button @click="navigateToChart" class="btn">
-                            View Chart (Alternative)
-                        </button>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="trips">
@@ -249,14 +245,6 @@ async function exportFullResult() {
 
 const chart_data = ref()
 
-const navigateToChart = () => {
-    fetchData()
-    router.push({
-        name: 'Chart',
-        query: { params: JSON.stringify(chart_data.value) }
-    })
-}
-
 async function fetchData() {
     await api.post('/chart', {
         limit: 0,
@@ -279,6 +267,24 @@ async function fetchData() {
         console.error('Error fetching data:', error)
     })
 }
+
+const navigateToChart = () => {
+    const params = {
+        limit: OFFSET,
+        offset: offset.value,
+        trip_id: param_trip_id.value,
+        subscriber_type: param_subscriber_type.value,
+        bike_id: param_bike_id.value,
+        bike_type: param_bike_type.value,
+        start_station_name: param_start_station_name.value,
+        end_station_name: param_end_station_name.value,
+        min_duration: param_min_duration.value,
+        max_duration: param_max_duration.value,
+        min_start_time: param_min_start_time.value,
+        max_start_time: param_max_start_time.value,
+    };
+    router.push({ name: 'Charts', query: params });
+};
 
 
 </script>

@@ -35,6 +35,15 @@ public class ChartService {
             case "Top 10 End Stations":
                 query = queryTop10EndStations(nestedQuery);
                 attribute = "end_station_name";
+                break;
+            case "Subscriber Types":
+                query = querySubscriberType(nestedQuery);
+                attribute = "subscriber_type";
+                break;
+            case "Duration":
+                query = queryDuration(nestedQuery);
+                attribute = "duration_minutes";
+                break;
         };
 
         log.info(query);
@@ -92,6 +101,25 @@ public class ChartService {
             GROUP_BY("end_station_name");
             ORDER_BY("COUNT(end_station_name) DESC");
             LIMIT(10);
+        }}.toString();
+    }
+
+    private String querySubscriberType(String nestedQuery) {
+        return new SQL(){{
+            SELECT("subscriber_type", "COUNT(end_station_name) AS count");
+            FROM("(" + nestedQuery + ")");
+            GROUP_BY("subscriber_type");
+            ORDER_BY("COUNT(subscriber_type) DESC");
+        }}.toString();
+    }
+
+    private String queryDuration(String nestedQuery) {
+        return new SQL(){{
+            SELECT("duration_minutes", "COUNT(duration_minutes) AS count");
+            FROM("(" + nestedQuery + ")");
+            WHERE("duration_minutes <= 70");
+            GROUP_BY("duration_minutes");
+            ORDER_BY("duration_minutes");
         }}.toString();
     }
 }

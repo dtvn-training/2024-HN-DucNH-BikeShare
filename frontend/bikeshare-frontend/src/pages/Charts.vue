@@ -8,69 +8,134 @@
             <BarChart :names="names_top10_end" :amounts="amounts_top10_end" :legend="'Bike returned'" :title="'Top 10 Most Returned Stations'"></BarChart>
         </div>
     </div>
-    <div class="buttons-container">
-        <v-btn @click="getTop10Start">Get Top 10 Start Stations</v-btn>
-        <v-btn @click="getTop10End">Get Top 10 End Stations</v-btn>
+    <div class="charts-container">
+        <div class="chart-item">
+            <PieChart :names="subscriber_type" :amounts="subscriber_type_amount" :legend="'Type'" :title="'Subscriber types of query trips'"></PieChart>
+        </div>
+        <div class="chart-item">
+            <LineChart :names="duration" :amounts="duration_amount" :legend="'Duration (minutes)'" :title="'Duration of query trips (below 70 minutes)'"></LineChart>
+        </div>
     </div>
 </template>
 
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
 import BarChart from '@/components/BarChart.vue';
+import LineChart from '@/components/LineChart.vue';
 import api from '@/config/api';
+import { onBeforeMount, onMounted } from 'vue';
+import { useRoute } from 'vue-router';
 
 const chart_data = ref()
-const names_top10_start = []
-const amounts_top10_start = []
-const names_top10_end = []
-const amounts_top10_end = []
+const names_top10_start = ref([]);
+const amounts_top10_start = ref([]);
+const names_top10_end = ref([]);
+const amounts_top10_end = ref([]);
+const subscriber_type = ref([])
+const subscriber_type_amount = ref([])
+const duration = ref([])
+const duration_amount = ref([])
+
+const route = useRoute();
+const params = route.query;
 
 async function getTop10Start() {
     await api.post('/chart/top10start', {
         limit: 0,
         offset: 0,
-        trip_id: "",
-        subscriber_type: "",
-        bike_id: "1",
-        bike_type: "",
-        start_station_name: "",
-        end_station_name: "",
-        min_duration: 22,
-        max_duration: 45,
-        min_start_time: "",
-        max_start_time: "",
+        trip_id: params.trip_id,
+        subscriber_type: params.subscriber_type,
+        bike_id: params.bike_id,
+        bike_type: params.bike_type,
+        start_station_name: params.start_station_name,
+        end_station_name: params.end_station_name,
+        min_duration: params.min_duration,
+        max_duration: params.max_duration,
+        min_start_time: params.min_start_time,
+        max_start_time: params.max_start_time,
     }).then(response => {
-        response.data.charts.map(chart => names_top10_start.push(chart.name));
-        response.data.charts.map(chart => amounts_top10_start.push(chart.amount));
+        names_top10_start.value = response.data.charts.map(chart => chart.name);
+        amounts_top10_start.value = response.data.charts.map(chart => chart.amount);
     }).catch(error => {
         console.error('Error fetching data:', error)
     })
 }
+
+onMounted(() => {
+    getTop10Start()
+    getTop10End()
+    getSubscriberType()
+    getDuration()
+})
 
 async function getTop10End() {
     await api.post('/chart/top10end', {
         limit: 0,
         offset: 0,
-        trip_id: "",
-        subscriber_type: "",
-        bike_id: "1",
-        bike_type: "",
-        start_station_name: "",
-        end_station_name: "",
-        min_duration: 11,
-        max_duration: 75,
-        min_start_time: "",
-        max_start_time: "",
+        trip_id: params.trip_id,
+        subscriber_type: params.subscriber_type,
+        bike_id: params.bike_id,
+        bike_type: params.bike_type,
+        start_station_name: params.start_station_name,
+        end_station_name: params.end_station_name,
+        min_duration: params.min_duration,
+        max_duration: params.max_duration,
+        min_start_time: params.min_start_time,
+        max_start_time: params.max_start_time,
     }).then(response => {
         console.log(response.data)
-        response.data.charts.map(chart => names_top10_end.push(chart.name));
-        response.data.charts.map(chart => amounts_top10_end.push(chart.amount));
+        names_top10_end.value = response.data.charts.map(chart => chart.name);
+        amounts_top10_end.value = response.data.charts.map(chart => chart.amount);
     }).catch(error => {
         console.error('Error fetching data:', error)
     })
 }
 
+async function getSubscriberType() {
+    await api.post('/chart/subscriber_type', {
+        limit: 0,
+        offset: 0,
+        trip_id: params.trip_id,
+        subscriber_type: params.subscriber_type,
+        bike_id: params.bike_id,
+        bike_type: params.bike_type,
+        start_station_name: params.start_station_name,
+        end_station_name: params.end_station_name,
+        min_duration: params.min_duration,
+        max_duration: params.max_duration,
+        min_start_time: params.min_start_time,
+        max_start_time: params.max_start_time,
+    }).then(response => {
+        console.log(response.data)
+        subscriber_type.value = response.data.charts.map(chart => chart.name);
+        subscriber_type_amount.value = response.data.charts.map(chart => chart.amount);
+    }).catch(error => {
+        console.error('Error fetching data:', error)
+    })
+}
 
+async function getDuration() {
+    await api.post('/chart/duration', {
+        limit: 0,
+        offset: 0,
+        trip_id: params.trip_id,
+        subscriber_type: params.subscriber_type,
+        bike_id: params.bike_id,
+        bike_type: params.bike_type,
+        start_station_name: params.start_station_name,
+        end_station_name: params.end_station_name,
+        min_duration: params.min_duration,
+        max_duration: params.max_duration,
+        min_start_time: params.min_start_time,
+        max_start_time: params.max_start_time,
+    }).then(response => {
+        console.log(response.data)
+        duration.value = response.data.charts.map(chart => chart.name);
+        duration_amount.value = response.data.charts.map(chart => chart.amount);
+    }).catch(error => {
+        console.error('Error fetching data:', error)
+    })
+}
 
 </script>
 
@@ -98,12 +163,5 @@ async function getTop10End() {
     border-radius: 8px;
     padding: 10px;
     background-color: #fff;
-}
-
-.buttons-container {
-    display: flex;
-    justify-content: center;
-    gap: 10px;
-    margin-top: 20px;
 }
 </style>

@@ -1,12 +1,13 @@
 <template>
-  <div>
-    <Bar :data="data1" :options="options" />
-  </div>
+    <div>
+        <Bar :data="data1" :options="options" />
+    </div>
 </template>
 
 <script setup>
 import { Bar } from 'vue-chartjs'
 import { Chart as ChartJS, BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend } from 'chart.js'
+import { computed } from 'vue';
 
 ChartJS.register(BarElement, CategoryScale, LinearScale, Title, Tooltip, Legend)
 
@@ -18,7 +19,7 @@ const props = defineProps({
 })
 
 
-const data1 = {
+const data1 = computed(() => ({
     labels: props.names,
     datasets: [
         {
@@ -27,12 +28,12 @@ const data1 = {
             data: props.amounts
         }
     ]
-}
+}))
 
 const options = {
-  responsive: true,
-  maintainAspectRatio: false,
-  plugins: {
+    responsive: true,
+    maintainAspectRatio: false,
+    plugins: {
         legend: {position: 'top',},
         title: {display: true, text: props.title},
     }
