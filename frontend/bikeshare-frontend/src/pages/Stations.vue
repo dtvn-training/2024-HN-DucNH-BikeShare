@@ -57,12 +57,34 @@
                         <ExportButton :table="table" :json="json"></ExportButton>
                     </div>
                 </div>
-                <v-data-table :headers="header" :items="stations">
+                <v-data-table :headers="header" :items="stations" @click:row="handleClick">
+                    <template #item.status="{ item }">
+                        <v-chip :color="item.status == 'active' ? 'green' : 'red'">
+                            {{ item.status }}
+                        </v-chip>
+                    </template>
+                    <template #item.location="{ item }">
+                        <v-icon @click="showMap(item)">mdi-map-marker</v-icon>
+                        <!-- <v-text-field v-model="item.location" readonly></v-text-field> -->
+                    </template>
                 </v-data-table>
             </div>
         </div>
     </div>
     <v-snackbar v-model="snackbar" :timeout="timeout">{{ text }}</v-snackbar>
+    <v-dialog v-model="mapDialog" max-width="700px" max-height="550px">
+        <v-card>
+            <v-card-title>
+                <p>{{ stationName }}</p>
+            </v-card-title>
+            <v-card-text>
+                <Map :latitude="selectedStation.latitude" :longitude="selectedStation.longitude"></Map>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn color="blue darken-1" text @click="mapDialog = false">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script setup>
@@ -70,6 +92,22 @@ import AppHeader from '@/components/AppHeader.vue';
 import { ref, computed } from 'vue';
 import api from '@/config/api';
 import ExportButton from '@/components/ExportButton.vue';
+import Map from './Map.vue';
+
+const mapDialog = ref(false);
+const stationName = ref('');
+const selectedStation = ref({ latitude: 0, longitude: 0 });
+
+function showMap(item) {
+    const [latitude, longitude] = item.location.replace('(', '').replace(')', '').split(',').map(num => parseFloat(num));
+
+    selectedStation.value = {
+        latitude: latitude,
+        longitude: longitude
+    };
+    stationName.value = item.name;
+    mapDialog.value = true;
+}
 
 const table = ref('stations')
 
@@ -86,6 +124,8 @@ const header = [
     { title: 'Foot print width', key: 'footprint_width', sortable: false },
     { title: 'Council district', key: 'council_district', sortable: false },
     { title: 'Modified date', key: 'modified_date', sortable: false },
+    { title: 'Location', key: 'location', sortable: false },
+
 ]
 const stations = ref()
 const property_options = ref(["Any", "paid_parking", "sidewalk", "parkland", "undetermined_parking", "nonmetered_parking"])
