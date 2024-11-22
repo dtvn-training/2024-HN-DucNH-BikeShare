@@ -44,6 +44,9 @@ public class ChartService {
                 query = queryDuration(nestedQuery);
                 attribute = "duration_minutes";
                 break;
+            case "Time period":
+                query = queryTimePeriod(nestedQuery);
+                attribute = "hour";
         };
 
         log.info(query);
@@ -122,4 +125,22 @@ public class ChartService {
             ORDER_BY("duration_minutes");
         }}.toString();
     }
+
+    private String queryTimePeriod(String nestedQuery) {
+        return new SQL(){{
+            SELECT("EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC') AS hour", "COUNT(EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC')) AS count");
+            FROM("(" + nestedQuery + ")");
+            GROUP_BY("hour");
+            ORDER_BY("hour");
+        }}.toString();
+    }
+
+//    private String queryTimePeriod(String nestedQuery) {
+//        return new SQL(){{
+//            SELECT("FLOOR(EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC') / 2) * 2 AS hour", "COUNT(*) AS count");
+//            FROM("(" + nestedQuery + ")");
+//            GROUP_BY("hour");
+//            ORDER_BY("hour");
+//        }}.toString();
+//    }
 }

@@ -88,10 +88,8 @@
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
-import { reactive, ref } from 'vue';
+import { ref } from 'vue';
 import api from '@/config/api';
-import ExportButton from '@/components/ExportButton.vue';
-import BarChart from '@/components/BarChart.vue';
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
@@ -242,36 +240,10 @@ async function exportFullResult() {
     }
 }
 
-
-const chart_data = ref()
-
-async function fetchData() {
-    await api.post('/chart', {
-        limit: 0,
-        offset: 0,
-        trip_id: param_trip_id.value,
-        subscriber_type: param_subscriber_type.value,
-        bike_id: param_bike_id.value,
-        bike_type: param_bike_type.value,
-        start_station_name: param_start_station_name.value,
-        end_station_name: param_end_station_name.value,
-        min_duration: param_min_duration.value,
-        max_duration: param_max_duration.value,
-        min_start_time: param_min_start_time.value,
-        max_start_time: param_max_start_time.value,
-    }).then(response => {
-        chart_data.value = response.data
-        console.log(response.data)
-        // router.push('/charts')
-    }).catch(error => {
-        console.error('Error fetching data:', error)
-    })
-}
-
 const navigateToChart = () => {
     const params = {
-        limit: OFFSET,
-        offset: offset.value,
+        limit: 0,
+        offset: 0,
         trip_id: param_trip_id.value,
         subscriber_type: param_subscriber_type.value,
         bike_id: param_bike_id.value,

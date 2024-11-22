@@ -39,4 +39,9 @@ public class ChartController {
     public ChartHolder getDuration(@RequestBody TripParamDTO params) {
         return chartService.getChartData(tripService.parsedQuery(params), "Duration");
     }
+
+    @PostMapping("/time_period")
+    public ChartHolder getTimePeriod(@RequestBody TripParamDTO params) {
+        return chartService.getChartData(tripService.parsedQuery(params), "Time period");
+    }
 }

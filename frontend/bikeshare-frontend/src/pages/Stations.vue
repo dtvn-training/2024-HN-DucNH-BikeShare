@@ -54,7 +54,6 @@
             <div class="table-content">
                 <div class="table-header">
                     <div class="button-group">
-                        <v-btn variant="outlined" class="btn" href="/charts">Charts</v-btn>
                         <ExportButton :table="table" :json="json"></ExportButton>
                     </div>
                 </div>
