@@ -23,7 +23,9 @@
                     </v-text-field>
                     <v-select
                         label="Property type"
-                        :items="property_options"
+                        :items="properties"
+                        item-title="text"
+                        item-value="value"
                         v-model="param_property_type"
                     ></v-select>
                     <v-radio-group inline label="Power type" v-model="param_power_type">
@@ -45,6 +47,7 @@
                     </v-range-slider>
                 </div>
                 <div class="center">
+                    <v-btn variant="tonal" class="btn" @click="resetParam">Reset</v-btn>
                     <v-btn variant="outlined" class="btn" @click="getStations">Search</v-btn>
                 </div>
             </div>
@@ -65,6 +68,9 @@
                     </template>
                     <template #item.location="{ item }">
                         <v-icon @click="showMap(item)">mdi-map-marker</v-icon>
+                    </template>
+                    <template #item.modified_date="{ item }">
+                        {{ formatTimestamp(new Date(item.modified_date)) }}
                     </template>
                 </v-data-table>
             </div>
@@ -105,6 +111,21 @@ const mapDialog = ref(false);
 const stationName = ref('');
 const selectedStation = ref({ latitude: 0, longitude: 0 });
 
+function resetParam() {
+    param_name.value = ''
+    param_status.value = ''
+    param_address.value = ''
+    param_property_type.value = ''
+    param_power_type.value = ''
+    docks_value.value = [0, 30]
+    length_value.value = [0, 70]
+    width_value.value = [0, 20]
+}
+
+function formatTimestamp(timestamp) {
+    return timestamp.toISOString().slice(0, 19).replace('T', ' ')
+}
+
 function showMap(item) {
     const [latitude, longitude] = item.location.replace('(', '').replace(')', '').split(',').map(num => parseFloat(num));
 
@@ -136,7 +157,16 @@ const header = [
 
 ]
 const stations = ref()
-const property_options = ref(["Any", "paid_parking", "sidewalk", "parkland", "undetermined_parking", "nonmetered_parking"])
+// const property_options = ref(["Any", "paid_parking", "sidewalk", "parkland", "undetermined_parking", "nonmetered_parking"])
+
+const properties = [
+    { text: "Any", value: "" },
+    { text: "Paid parking", value: "paid_parking" },
+    { text: "Sidewalk", value: "sidewalk" },
+    { text: "Parkland", value: "parkland" },
+    { text: "Undetermined parking", value: "undetermined_parking" },
+    { text: "Nonmetered parking", value: "nonmetered_parking" }
+]
 
 let min_dock = ref(0)
 let max_dock = ref(30)

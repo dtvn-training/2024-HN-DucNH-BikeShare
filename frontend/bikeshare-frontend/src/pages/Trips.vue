@@ -62,6 +62,7 @@
                 
                 </div>
                 <div class="center">
+                    <v-btn variant="tonal" class="btn" @click="resetParam">Reset</v-btn>
                     <v-btn variant="outlined" class="btn" @click="getTrips">Search</v-btn>
                 </div>
             </div>
@@ -79,6 +80,11 @@
                     <template #item.start_station_name="{ item }">
                         <div @click="handlePopup(item)">
                             {{ item.start_station_name }}
+                        </div>
+                    </template>
+                    <template #item.start_time="{ item }">
+                        <div>
+                            {{ formatTimestamp(new Date(item.start_time)) }}
                         </div>
                     </template>
                 </v-data-table>
@@ -149,6 +155,23 @@ const stations = ref([])
 const selectedStation = ref()
 const stationInfo = ref()
 const coordinates = ref()
+
+function formatTimestamp(timestamp) {
+    return timestamp.toISOString().slice(0, 19).replace('T', ' ')
+}
+
+function resetParam() {
+    param_trip_id.value = ""
+    param_subscriber_type.value = ""
+    param_bike_id.value = ""
+    param_bike_type.value = ""
+    param_start_station_name.value = ""
+    param_end_station_name.value = ""
+    param_min_duration.value = 0
+    param_max_duration.value = 0
+    param_min_start_time.value = ""
+    param_max_start_time.value = ""
+}
 
 function handlePopup(item) {
     popup.value = true
