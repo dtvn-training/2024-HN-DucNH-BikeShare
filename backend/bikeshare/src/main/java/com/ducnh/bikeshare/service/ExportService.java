@@ -1,5 +1,6 @@
 package com.ducnh.bikeshare.service;
 
+import com.ducnh.bikeshare.constant.Constant;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
@@ -25,14 +26,22 @@ public class ExportService implements IExportService{
             throw new IOException("Empty");
         }
 
+        int number_of_sheet = data.size() / Constant.ROWS_PER_SHEET + 1;
+        System.out.println(number_of_sheet);
+        int start, end;
+
         try (SXSSFWorkbook workbook = new SXSSFWorkbook(DEFAULT_WINDOW_SIZE)) {
-            Sheet sheet = workbook.createSheet();
+            for (int sheetNo = 0; sheetNo < number_of_sheet; sheetNo++) {
+                Sheet sheet = workbook.createSheet("Sheet " + sheetNo);
+                start = Constant.ROWS_PER_SHEET * sheetNo;
+                end = Math.min(start + Constant.ROWS_PER_SHEET, data.size());
 
-            Class<?> aClass = data.get(0).getClass();
-            Field[] fields = aClass.getDeclaredFields();
+                Class<?> aClass = data.get(0).getClass();
+                Field[] fields = aClass.getDeclaredFields();
 
-            createHeaderRow(sheet, fields);
-            addDataRows(data, sheet, fields);
+                createHeaderRow(sheet, fields);
+                addDataRows(data, sheet, fields, start, end);
+            }
 
             try (ServletOutputStream outStream = response.getOutputStream()) {
                 workbook.write(outStream);
@@ -53,16 +62,18 @@ public class ExportService implements IExportService{
         }
     }
 
-    private <T> void addDataRows(List<T> data, Sheet sheet, Field[] fields) {
+    private <T> void addDataRows(List<T> data, Sheet sheet, Field[] fields, int start, int end) {
+        System.out.println(start + " " + end);
         int rowNum = 1;
-        for (T item : data) {
+        for (int j = start; j < end; j++) {
             Row row = sheet.createRow(rowNum++);
             for (int i = 0; i < fields.length; i++) {
                 Cell cell = row.createCell(i);
                 Field field = fields[i];
                 field.setAccessible(true);
                 try {
-                    Object value = field.get(item);
+//                    System.out.println(data.get(j));
+                    Object value = field.get(data.get(j));
                     setCellValue(cell, value);
                 } catch (IllegalAccessException e) {
                     cell.setCellValue("");
