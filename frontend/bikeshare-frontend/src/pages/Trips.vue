@@ -76,6 +76,11 @@
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="trips">
+                    <template #item.start_station_name="{ item }">
+                        <div @click="handlePopup(item)">
+                            {{ item.start_station_name }}
+                        </div>
+                    </template>
                 </v-data-table>
                 <v-btn variant="outlined" class="btn" @click="loadMore" :disabled="disable">Load more</v-btn>
             </div>
@@ -83,18 +88,32 @@
     </div>
 
     <v-snackbar v-model="snackbar" :timeout="timeout">{{ text }}</v-snackbar>
+    <v-dialog v-model="popup" max-width="700px" max-height="550px">
+        <v-card>
+            <v-card-title>
+                <p>{{ selectedStation.name }}</p>
+            </v-card-title>
+            <v-card-text>
+                <Map :latitude="coordinates.latitude" :longitude="coordinates.longitude"></Map>
+            </v-card-text>
+            <v-card-actions>
+                <v-btn color="blue darken-1" text @click="mapDialog = false">Close</v-btn>
+            </v-card-actions>
+        </v-card>
+    </v-dialog>
 </template>
 
 <script setup>
 import AppHeader from '@/components/AppHeader.vue';
 import { VNumberInput } from 'vuetify/labs/VNumberInput'
-import { ref } from 'vue';
+import { onMounted, ref } from 'vue';
 import api from '@/config/api';
 import { useRouter } from 'vue-router'
 const router = useRouter()
 
 const OFFSET = 400
 const table = ref('trips')
+const popup = ref(false)
 
 const header = [
     { title: 'Trip ID', key: 'trip_id', sortable: false },
@@ -126,11 +145,58 @@ const snackbar = ref(false)
 const text = ref()
 const timeout = ref(2000)
 
+const stations = ref([])
+const selectedStation = ref()
+const stationInfo = ref()
+const coordinates = ref()
+
+function handlePopup(item) {
+    popup.value = true
+    selectedStation.value = {...item}
+    console.log(selectedStation.value)
+    for (const station of stations.value) {
+        if (station.name === selectedStation.value.start_station_name) {
+            stationInfo.value = station
+            console.log("found")
+            break
+        }
+    }
+    const [latitude1, longitude1] = stationInfo.value.location.replace('(', '').replace(')', '').split(',').map(num => parseFloat(num));
+    coordinates.value = {
+        latitude: latitude1,
+        longitude: longitude1
+    };
+}
+
+async function getStations() {
+    await api.post(`/stations`, {
+        name: "",
+        address: "",
+        status: "",
+        property_type: "",
+        power_type: "",
+        min_docks: 0,
+        max_docks: 0,
+        min_length: 0,
+        max_length: 0,
+        min_width: 0,
+        max_width: 0,
+    })
+        .then((response) => {
+            stations.value = response.data.stations
+        }).catch((error) => {
+            console.log(error);
+        })
+}
+
+onMounted(() => {
+    getStations()
+})
+
 function openSnackbar(content) {
     text.value = content
     snackbar.value = true
 }
-
 
 // Query trips info with limited number of rows
 async function getTrips() {

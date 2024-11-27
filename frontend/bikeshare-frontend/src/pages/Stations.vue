@@ -65,20 +65,27 @@
                     </template>
                     <template #item.location="{ item }">
                         <v-icon @click="showMap(item)">mdi-map-marker</v-icon>
-                        <!-- <v-text-field v-model="item.location" readonly></v-text-field> -->
                     </template>
                 </v-data-table>
             </div>
         </div>
     </div>
     <v-snackbar v-model="snackbar" :timeout="timeout">{{ text }}</v-snackbar>
-    <v-dialog v-model="mapDialog" max-width="700px" max-height="550px">
+    <v-dialog v-model="mapDialog" max-width="700px" max-height="850px">
         <v-card>
             <v-card-title>
                 <p>{{ stationName }}</p>
             </v-card-title>
             <v-card-text>
                 <Map :latitude="selectedStation.latitude" :longitude="selectedStation.longitude"></Map>
+            </v-card-text>
+            <v-card-text>
+                <p>Address: <strong>{{ selectedStation.address }}</strong></p>
+                <p>Status: <strong>{{ selectedStation.status }}</strong></p>
+                <p>Number of docks: <strong>{{ selectedStation.number_of_docks }}</strong></p>
+                <p>Power type: <strong>{{ selectedStation.power_type }}</strong></p>
+                <p>Footprint length: <strong>{{ selectedStation.footprint_length }}</strong></p>
+                <p>Footprint width: <strong>{{ selectedStation.footprint_width }}</strong></p>
             </v-card-text>
             <v-card-actions>
                 <v-btn color="blue darken-1" text @click="mapDialog = false">Close</v-btn>
@@ -105,6 +112,7 @@ function showMap(item) {
         latitude: latitude,
         longitude: longitude
     };
+    selectedStation.value = {...item, latitude, longitude};
     stationName.value = item.name;
     mapDialog.value = true;
 }
