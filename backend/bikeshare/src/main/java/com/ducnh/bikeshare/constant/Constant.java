@@ -5,5 +5,5 @@ public final class Constant {
     public static final String TABLE_TRIPS = "`springboot-bq.bikeshare.trips`";
     public static final String FRONTEND_URL = "http://localhost:3000";
     public static final int LIMIT_NUMBER_OF_RESULTS = 400;
-    public static final int ROWS_PER_SHEET = 1000000;
+    public static final int ROWS_PER_SHEET = 500000;
 }
