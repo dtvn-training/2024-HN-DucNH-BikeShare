@@ -2,13 +2,20 @@
 
 ## Issues found / Enhancement
 
-|No |Issues                                                                                    |Status       |
-|---|------------------------------------------------------------------------------------------|-------------|
-|1  |`property_type` value ‘Any’ should be ‘’ when selecting then de-selecting                 |Fixed        |
-|2  |Exported file should include query detail                                                 |To do        |
-|3  |Reset button to delete all current params                                                 |Fixed        |
-|4  |Modify timestamp format                                                                   |Fixed        |
-|5  |Cut the excel sheet after each 1000000 rows                                               |In progress  |
+|No |Type      |Issues                                                                                    |Status                    |Solution                                     |
+|---|----------|------------------------------------------------------------------------------------------|--------------------------|---------------------------------------------|
+|1  |Functional|`property_type` value ‘Any’ should be ‘’ when selecting then de-selecting                 |Fixed                     |                                             |
+|2  |UX        |Exported file should include query detail                                                 |To do (medium priority)   |                                             |
+|3  |UI/UX     |Reset button to delete all current params                                                 |Fixed                     |                                             |
+|4  |UI/UX     |Modify timestamp format                                                                   |Fixed                     |                                             |
+|5  |Functional|Cut the excel sheet after each 1000000 rows                                               |Fixed                     |Calculate number of sheets neeed and create a new one after every 1m records|
+|6  |Functional|'This archive contains unclosed entries'                                                  |Fixed                     |Increase timeout length of axios API calling |
+|7  |UX        |Reduce waiting time when exporting file                                                   |To do (low priority)      |Save download files on cloud, allow redownload|
+|8  |Functional|Reduce query cost for getting data for charts                                             |To do (low priority)      |Save user query result in a temp table, then run other queries on that table|
+|9  |Functional|Show data of stations in Trip table (problem: different name format between 2 tables)     |To do (low priority)      ||
+|10 |Functional|Allow to calculate distance between 2 stations                                            |To do (medium priority)   ||
+|11 |UX        |Keep query result after navigating back from chart screen                                 |To do (medium priority)   ||
+|12 |UX        |There is no data to show in charts                                                        |Fixed                     |Add snackbar to notify user|
 
 ## Stage 1: Stations table
 
@@ -34,8 +41,8 @@
 
 |No |Input parameters                                                                          |(Expected) result                     |Status|Export Status|Charts Status|Note|
 |---|------------------------------------------------------------------------------------------|--------------------------------------|:----:|:-----------:|:-----------:|----|
-|1  |trip_id = ‘1’                                                                             |1551200 records, export in 4 min      |Tested|   Tested    | Tested      |Found bug when exporting large file that exceeds max number of rows of a sheet (#5)|
-|2  |                                                                                          |2271152 records, crash in about 5 min |Tested|   Failed    |             |Returned error “This archive contains unclosed entries” – to be fixed|
+|1  |trip_id = ‘1’                                                                             |1551200 records, export in 4 min      |Tested|Tested       | Tested      |Found bug when exporting large file that exceeds max number of rows of a sheet (#5)|
+|2  |                                                                                          |2271152 records, export in about 5 min|Tested|Tested       | Tested      |Found bug 'This archive contains unclosed entries' (#6)|
 |3  |trip_id = '123', duration = [7, 10]                                                       |2835 records                          |Tested|Tested       |Tested       ||
 |4  |bike_type = 'electric', start_station_name = 'henderson'                                  |6288 records                          |Tested|Tested       |Tested       ||
 |5  |start_time = ['01-01-2022 00:00', '02-01-2022 00:00']                                     |14513 records                         |Tested|Tested       |Tested       ||
@@ -44,3 +51,14 @@
 |8  |start_station_name = '8th/Congress', end_station_name = '8th/Congress'                    |1162 records                          |Tested|Tested       |Tested       ||
 |9  |start_station_name = '6th/West', duration >= 15, start_time < '06-28-2022 12:00'          |4487 records                          |Tested|Tested       |Tested       ||
 |10 |bike_id = '19274'                                                                         |2755 records                          |Tested|Tested       |Tested       ||
+|11 |subscriber_type = 'Single Trip', start_time = ['01-01-2022 00:00', '12-31-2022 23:59']    |3912 records                          |Tested|Tested       |Tested       ||
+|12 |start_station_name = '21st/Speedway', end_station_name = '11th/Congress', start_time = ['01-01-2021 00:00', '12-31-2021 23:59']|28 records|Tested|Tested|Tested     ||
+|13 |bike_id = '19274', start_station_name = '28th/Rio'                                        |143 records                           |Tested|Tested       |Tested       ||
+|14 |start_station_name = '21st/Speedway', duration <= 15                                      |15817 records                         |Tested|Tested       |Tested       ||
+|15 |trip_id = '27269479'                                                                      |1 record                              |Tested|Tested       |Tested       ||
+|16 |subscriber_type = 'Pay-as-you-ride', bike_type = 'electric', start_station_name = '6th', duration = [10, 20], start_time = ['02-01-2021 08:00', '05-01-2022 08:00']| 678 records|Tested|Tested|Tested||
+|17 |subscriber_type = 'Local365', start_time = ['05-01-2021 00:00', '05-31-2021 23:59']       |4970 records                          |Tested|Tested       |Tested       ||
+|18 |bike_id = '23'                                                                            |66327 records                         |Tested|Tested       |Tested       ||
+|19 |duration = [54, 53]                                                                       |0 records                             |Tested|Tested       |Tested       |No data found case (#12)|
+|20 |bike_type = 'classic', start_station_name = '4th', duration >= 15                         |30176 records                         |Tested|Tested       |Tested       ||
+|21 |bike_id = '2'                                                                             |1031425 records                       |Tested|Tested       |Tested       ||

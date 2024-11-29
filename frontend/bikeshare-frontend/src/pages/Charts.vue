@@ -130,7 +130,10 @@ async function getTop10End() {
         min_start_time: params.min_start_time,
         max_start_time: params.max_start_time,
     }).then(response => {
-        console.log(response.data)
+        if (response.data.charts.length === 0) {
+            openSnackbar("No data found")
+            return
+        }
         names_top10_end.value = response.data.charts.map(chart => chart.name);
         amounts_top10_end.value = response.data.charts.map(chart => chart.amount);
     }).catch(error => {
@@ -153,7 +156,10 @@ async function getSubscriberType() {
         min_start_time: params.min_start_time,
         max_start_time: params.max_start_time,
     }).then(response => {
-        console.log(response.data)
+        if (response.data.charts.length === 0) {
+            openSnackbar("No data found")
+            return
+        }
         subscriber_type.value = response.data.charts.map(chart => chart.name);
         subscriber_type_amount.value = response.data.charts.map(chart => chart.amount);
     }).catch(error => {
@@ -176,7 +182,10 @@ async function getDuration() {
         min_start_time: params.min_start_time,
         max_start_time: params.max_start_time,
     }).then(response => {
-        console.log(response.data)
+        if (response.data.charts.length === 0) {
+            openSnackbar("No data found")
+            return
+        }
         duration.value = response.data.charts.map(chart => chart.name);
         duration_amount.value = response.data.charts.map(chart => chart.amount);
     }).catch(error => {
@@ -199,7 +208,10 @@ async function getTimePeriod() {
         min_start_time: params.min_start_time,
         max_start_time: params.max_start_time,
     }).then(response => {
-        console.log(response.data)
+        if (response.data.charts.length === 0) {
+            openSnackbar("No data found")
+            return
+        }
         time_period.value = response.data.charts.map(chart => chart.name);
         time_period_amount.value = response.data.charts.map(chart => chart.amount);
     }).catch(error => {
