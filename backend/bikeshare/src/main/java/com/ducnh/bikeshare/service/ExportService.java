@@ -1,6 +1,7 @@
 package com.ducnh.bikeshare.service;
 
 import com.ducnh.bikeshare.constant.Constant;
+import com.ducnh.bikeshare.dto.TripParamDTO;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import jakarta.servlet.ServletOutputStream;
@@ -21,7 +22,7 @@ public class ExportService implements IExportService{
     // Functions for exporting excel directly from BigQuery
 
     @Override
-    public <P> void exportToExcel(List<P> data, HttpServletResponse response) throws IOException{
+    public <P> void exportToExcel(List<P> data, HttpServletResponse response, TripParamDTO params) throws IOException{
         if (data == null || data.isEmpty()) {
             throw new IOException("Empty");
         }
@@ -31,6 +32,8 @@ public class ExportService implements IExportService{
         int start, end;
 
         try (SXSSFWorkbook workbook = new SXSSFWorkbook(DEFAULT_WINDOW_SIZE)) {
+            String queryInfo = getParams(params);
+
             for (int sheetNo = 0; sheetNo < number_of_sheet; sheetNo++) {
                 Sheet sheet = workbook.createSheet("Sheet " + sheetNo);
                 start = Constant.ROWS_PER_SHEET * sheetNo;
@@ -38,6 +41,10 @@ public class ExportService implements IExportService{
 
                 Class<?> aClass = data.get(0).getClass();
                 Field[] fields = aClass.getDeclaredFields();
+
+                Row queryRow = sheet.createRow(0);
+                Cell cell = queryRow.createCell(0);
+                setCellValue(cell, queryInfo);
 
                 createHeaderRow(sheet, fields);
                 addDataRows(data, sheet, fields, start, end);
@@ -55,7 +62,7 @@ public class ExportService implements IExportService{
     }
 
     private void createHeaderRow(Sheet sheet, Field[] fields) {
-        Row headerRow = sheet.createRow(0);
+        Row headerRow = sheet.createRow(1);
         for (int i = 0; i < fields.length; i++) {
             Cell cell = headerRow.createCell(i);
             cell.setCellValue(fields[i].getName());
@@ -63,8 +70,7 @@ public class ExportService implements IExportService{
     }
 
     private <T> void addDataRows(List<T> data, Sheet sheet, Field[] fields, int start, int end) {
-        System.out.println(start + " " + end);
-        int rowNum = 1;
+        int rowNum = 2;
         for (int j = start; j < end; j++) {
             Row row = sheet.createRow(rowNum++);
             for (int i = 0; i < fields.length; i++) {
@@ -72,7 +78,6 @@ public class ExportService implements IExportService{
                 Field field = fields[i];
                 field.setAccessible(true);
                 try {
-//                    System.out.println(data.get(j));
                     Object value = field.get(data.get(j));
                     setCellValue(cell, value);
                 } catch (IllegalAccessException e) {
@@ -82,6 +87,11 @@ public class ExportService implements IExportService{
         }
     }
 
+    private String getParams(TripParamDTO params) {
+        return "Trip ID: " + params.getTrip_id() + " Subscriber Type: " + params.getSubscriber_type() + " Bike Type: " + params.getBike_type() + " Bike ID: " + params.getBike_type() +
+                " Start station: " + params.getStart_station_name() + " End station: " + params.getEnd_station_name() + " Min duration: " + params.getMin_duration() +
+                " Max duration: " + params.getMax_duration() + " Min start time: " + params.getMin_start_time() + " Max start time: " + params.getMax_start_time();
+    }
 
     // Functions for exporting excel from frontend response in JSON type
 

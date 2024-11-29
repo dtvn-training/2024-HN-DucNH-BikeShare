@@ -4,18 +4,18 @@
 
 |No |Type      |Issues                                                                                    |Status                    |Solution                                     |
 |---|----------|------------------------------------------------------------------------------------------|--------------------------|---------------------------------------------|
-|1  |Functional|`property_type` value ‘Any’ should be ‘’ when selecting then de-selecting                 |Fixed                     |                                             |
-|2  |UX        |Exported file should include query detail                                                 |To do (medium priority)   |                                             |
-|3  |UI/UX     |Reset button to delete all current params                                                 |Fixed                     |                                             |
-|4  |UI/UX     |Modify timestamp format                                                                   |Fixed                     |                                             |
-|5  |Functional|Cut the excel sheet after each 1000000 rows                                               |Fixed                     |Calculate number of sheets neeed and create a new one after every 1m records|
-|6  |Functional|'This archive contains unclosed entries'                                                  |Fixed                     |Increase timeout length of axios API calling |
-|7  |UX        |Reduce waiting time when exporting file                                                   |To do (low priority)      |Save download files on cloud, allow redownload|
-|8  |Functional|Reduce query cost for getting data for charts                                             |To do (low priority)      |Save user query result in a temp table, then run other queries on that table|
+|1  |Functional|`property_type` value ‘Any’ should be ‘’ when selecting then de-selecting                 |Fixed (27.11)             |                                             |
+|2  |UX        |Exported file should include query detail                                                 |Fixed (29.11)             |Added parameters at the first row of the file|
+|3  |UI/UX     |Reset button to delete all current params                                                 |Fixed (27.11)             |                                             |
+|4  |UI/UX     |Modify timestamp format                                                                   |Fixed (27.11)             |                                             |
+|5  |Functional|Cut the excel sheet after each 1000000 rows                                               |Fixed (27.11)             |Calculate number of sheets neeed and create a new one after every 1m records|
+|6  |Functional|Exception thrown: 'This archive contains unclosed entries' when exporting file            |Fixed (29.11)             |Increase timeout length of axios API calling |
+|7  |UX        |Reduce waiting time when exporting file                                                   |To do (for buffer time)   |Save download files on cloud, allow redownload|
+|8  |Functional|Reduce query cost for getting data for charts                                             |To do (for buffer time)   |Save user query result in a temp table, then run other queries on that table|
 |9  |Functional|Show data of stations in Trip table (problem: different name format between 2 tables)     |To do (low priority)      ||
-|10 |Functional|Allow to calculate distance between 2 stations                                            |To do (medium priority)   ||
-|11 |UX        |Keep query result after navigating back from chart screen                                 |To do (medium priority)   ||
-|12 |UX        |There is no data to show in charts                                                        |Fixed                     |Add snackbar to notify user|
+|10 |Functional|Allow to calculate distance between 2 stations (problem: relate to #9)                    |To do (medium priority)   ||
+|11 |UX        |Keep query result after navigating back from chart screen                                 |Fixed (29.11)             |Open chart page in a new tab                 |
+|12 |UX        |There is no data to show in charts                                                        |Fixed (29.11)             |Add snackbar to notify user                  |
 
 ## Stage 1: Stations table
 

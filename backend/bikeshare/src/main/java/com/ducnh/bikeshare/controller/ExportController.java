@@ -38,6 +38,6 @@ public class ExportController {
     public void export(@RequestBody TripParamDTO params,
                        HttpServletResponse response) throws IOException {
         List<Trip> trips = tripService.getTrips(params).getTrips();
-        exportService.exportToExcel(trips, response);
+        exportService.exportToExcel(trips, response, params);
     }
 }

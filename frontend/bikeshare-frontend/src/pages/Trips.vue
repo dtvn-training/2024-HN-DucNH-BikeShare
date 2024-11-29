@@ -344,7 +344,8 @@ const navigateToChart = () => {
         min_start_time: param_min_start_time.value,
         max_start_time: param_max_start_time.value,
     };
-    router.push({ name: 'Charts', query: params });
+    const routeData = router.resolve({ name: 'Charts', query: params });
+    window.open(routeData.href, '_blank');
 };
 
 
