@@ -60,7 +60,7 @@
                         <ExportButton :table="table" :json="json"></ExportButton>
                     </div>
                 </div>
-                <v-data-table :headers="header" :items="stations" @click:row="handleClick">
+                <v-data-table :headers="header" :items="stations">
                     <template #item.status="{ item }">
                         <v-chip :color="item.status == 'active' ? 'green' : 'red'">
                             {{ item.status }}
@@ -76,6 +76,8 @@
             </div>
         </div>
     </div>
+    <AppFooter></AppFooter>
+
     <v-snackbar v-model="snackbar" :timeout="timeout">{{ text }}</v-snackbar>
     <v-dialog v-model="mapDialog" max-width="700px" max-height="850px">
         <v-card>
@@ -106,10 +108,7 @@ import { ref, computed } from 'vue';
 import api from '@/config/api';
 import ExportButton from '@/components/ExportButton.vue';
 import Map from './Map.vue';
-
-const mapDialog = ref(false);
-const stationName = ref('');
-const selectedStation = ref({ latitude: 0, longitude: 0 });
+import AppFooter from '@/components/AppFooter.vue';
 
 function resetParam() {
     param_name.value = ''
@@ -128,7 +127,7 @@ function formatTimestamp(timestamp) {
 
 function showMap(item) {
     const [latitude, longitude] = item.location.replace('(', '').replace(')', '').split(',').map(num => parseFloat(num));
-
+    
     selectedStation.value = {
         latitude: latitude,
         longitude: longitude
@@ -138,7 +137,20 @@ function showMap(item) {
     mapDialog.value = true;
 }
 
+function openSnackbar(content) {
+    text.value = content
+    snackbar.value = true
+}
+
 const table = ref('stations')
+const mapDialog = ref(false);
+const stationName = ref('');
+const selectedStation = ref({ latitude: 0, longitude: 0 });
+const json = ref()
+const snackbar = ref(false)
+const text = ref()
+const timeout = ref(2000)
+const stations = ref()
 
 const header = [
     { title: 'Name', key: 'name', sortable: false },
@@ -154,10 +166,7 @@ const header = [
     { title: 'Council district', key: 'council_district', sortable: false },
     { title: 'Modified date', key: 'modified_date', sortable: false },
     { title: 'Location', key: 'location', sortable: false },
-
 ]
-const stations = ref()
-// const property_options = ref(["Any", "paid_parking", "sidewalk", "parkland", "undetermined_parking", "nonmetered_parking"])
 
 const properties = [
     { text: "Any", value: "" },
@@ -191,11 +200,6 @@ let param_max_footprint_width = ref()
 const docks_value = ref([0, 30])
 const length_value = ref([0, 70])
 const width_value = ref([0, 20])
-
-function openSnackbar(content) {
-    text.value = content
-    snackbar.value = true
-}
 
 async function getStations() {
     openSnackbar("Querying...")
@@ -244,11 +248,6 @@ async function getStations() {
             console.log(error);
         })
 }
-
-const json = ref()
-const snackbar = ref(false)
-const text = ref()
-const timeout = ref(2000)
 
 </script>
 
