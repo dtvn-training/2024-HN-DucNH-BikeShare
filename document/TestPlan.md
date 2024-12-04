@@ -1,6 +1,6 @@
 # Test Plan
 
-## Issues found / Enhancement
+## Issues found / Improvements
 
 |No |Type      |Issues                                                                                    |Status                    |Solution                                     |
 |---|----------|------------------------------------------------------------------------------------------|--------------------------|---------------------------------------------|
@@ -12,8 +12,8 @@
 |6  |Functional|Exception thrown: 'This archive contains unclosed entries' when exporting file            |Fixed (29.11)             |Increase timeout length of axios API calling |
 |7  |UX        |Reduce waiting time when exporting file                                                   |To do (for buffer time)   |Save download files on cloud, allow redownload|
 |8  |Functional|Reduce query cost for getting data for charts                                             |To do (for buffer time)   |Save user query result in a temp table, then run other queries on that table|
-|9  |Functional|Show data of stations in Trip table (problem: different name format between 2 tables)     |To do (low priority)      ||
-|10 |Functional|Allow to calculate distance between 2 stations (problem: relate to #9)                    |To do (medium priority)   ||
+|9  |Functional|Show data of stations in Trip table (problem: different name format between 2 tables)     |Fixed (4.12)              |Format the station name (cannot cover all cases) and display when data is valid|
+|10 |Functional|Allow to calculate distance between 2 stations (problem: relate to #9)                    |Fixed (4.12)              |Use coordinates of stations to calculate and display with #9 info|
 |11 |UX        |Keep query result after navigating back from chart screen                                 |Fixed (29.11)             |Open chart page in a new tab                 |
 |12 |UX        |There is no data to show in charts                                                        |Fixed (29.11)             |Add snackbar to notify user                  |
 

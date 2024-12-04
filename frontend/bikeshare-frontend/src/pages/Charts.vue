@@ -235,7 +235,7 @@ async function getTimePeriod() {
 
 .chart-item {
     flex: 1;
-    min-width: 700px;
+    min-width: 300px;
     max-width: 1000px;
     height: 750px;
     /* display: flex; */

@@ -73,13 +73,13 @@
                 <div class="table-header">
                     <div class="button-group">
                         <v-btn variant="outlined" class="btn" @click="navigateToChart">Charts</v-btn>
-                        <v-btn variant="outlined" class="btn" @click="exportFullResult">Export</v-btn>
+                        <v-btn variant="outlined" class="btn" @click="exportFullResult" :disabled="disabled">Export</v-btn>
                     </div>
                 </div>
                 <v-data-table :headers="header" :items="trips">
                     <template #item.start_station_name="{ item }">
                         <div>
-                            <p @click="handlePopup(item.start_station_name, item.end_station_name)">
+                            <p @click="handlePopup(item.start_station_name, item.end_station_name)" class="address">
                                 {{ item.start_station_name }}
                             </p>
                         </div>
@@ -91,7 +91,7 @@
                     </template>
                     <template #item.end_station_name="{ item }">
                         <div>
-                            <p @click="handlePopup(item.start_station_name, item.end_station_name)">
+                            <p @click="handlePopup(item.start_station_name, item.end_station_name)" class="address">
                                 {{ item.end_station_name }}
                             </p>
                         </div>
@@ -164,12 +164,14 @@ const param_max_start_time = ref("")
 const offset = ref(0)
 
 const OFFSET = 400
+const TIMEOUT = 2000
 const popup = ref(false)
 const disable = ref(true)
 const snackbar = ref(false)
 const text = ref()
-const timeout = ref(2000)
+const timeout = ref(TIMEOUT)
 const json = ref()
+const disabled = ref(false)
 
 const stations = ref([])
 const selectedTrip = ref({
@@ -404,7 +406,9 @@ async function loadMore() {
 
 // Export all trips (no limited number of rows)
 async function exportFullResult() {
+    timeout.value = 300000
     openSnackbar("Exporting...")
+    disabled.value = true
     try {
         const response = await api.post(`/export/trips/getAll`, {
             limit: 0,
@@ -441,9 +445,16 @@ async function exportFullResult() {
         link.click();
         window.URL.revokeObjectURL(url);
         document.body.removeChild(link);
+        timeout.value = TIMEOUT;
+        snackbar.value = false;
+        disabled.value = false;
     } catch (error) {
         console.error('Download failed:', error);
     }
+}
+
+window.onbeforeunload = function() {
+    return "";
 }
 
 </script>
@@ -521,5 +532,10 @@ async function exportFullResult() {
 
     .center {
         text-align: center;
+    }
+
+    .address {
+        cursor: pointer;
+        text-decoration: underline;
     }
 </style>
