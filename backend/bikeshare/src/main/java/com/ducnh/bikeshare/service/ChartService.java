@@ -134,13 +134,4 @@ public class ChartService {
             ORDER_BY("hour");
         }}.toString();
     }
-
-//    private String queryTimePeriod(String nestedQuery) {
-//        return new SQL(){{
-//            SELECT("FLOOR(EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC') / 2) * 2 AS hour", "COUNT(*) AS count");
-//            FROM("(" + nestedQuery + ")");
-//            GROUP_BY("hour");
-//            ORDER_BY("hour");
-//        }}.toString();
-//    }
 }

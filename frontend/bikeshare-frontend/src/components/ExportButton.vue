@@ -10,10 +10,6 @@ const props = defineProps({
 });
 
 async function downloadExcel(table, json) {
-    // if (isEmpty(json)) {
-    //     console.error('No data to export');
-    //     return;
-    // }
     if (json === undefined) {
         console.error('No data to export');
         return;

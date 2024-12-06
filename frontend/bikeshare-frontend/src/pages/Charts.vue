@@ -16,13 +16,13 @@
             <v-btn @click="loadSubscriber">Load</v-btn>
         </div>
         <div class="chart-item">
-            <LineChart :names="duration" :amounts="duration_amount" :legend="'Duration (minutes)'" :title="'Duration of query trips (below 70 minutes)'" :x_label="'Duration in minutes'"></LineChart>
+            <LineChart :names="duration" :amounts="duration_amount" :legend="'Amount'" :title="'Duration of query trips (below 70 minutes)'" :x_label="'Duration (minutes)'"></LineChart>
             <v-btn @click="loadDuration">Load</v-btn>
         </div>
     </div>
     <div class="charts-container">
         <div class="chart-item">
-            <LineChart :names="time_period" :amounts="time_period_amount" :legend="'Time period'" :title="'Time period of query trips'" :x_label="'Time started in hour'"></LineChart>
+            <LineChart :names="time_period" :amounts="time_period_amount" :legend="'Amount'" :title="'Time period of query trips'" :x_label="'Time started in hour'"></LineChart>
             <v-btn @click="loadPeriod">Load</v-btn>
         </div>
     </div>
@@ -107,6 +107,7 @@ async function getTop10Start() {
 }
 
 // Reserved for automatically loading the data:
+
 // onMounted(() => {
 //     getTop10Start()
 //     getTop10End()
