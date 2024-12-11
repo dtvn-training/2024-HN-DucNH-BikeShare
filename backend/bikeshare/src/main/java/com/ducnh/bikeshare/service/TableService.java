@@ -6,11 +6,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
-import org.springframework.util.StringUtils;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
@@ -20,7 +18,7 @@ import java.util.UUID;
 @Service
 public class TableService {
     @Value("${GCP_SERVICE_ACCOUNT_KEY}")
-    private static String googleCredentialsJson;
+    private static String GCP_SERVICE_ACCOUNT_KEY;
 
     private static final Logger log = LoggerFactory.getLogger(TableService.class);
 
@@ -41,9 +39,9 @@ public class TableService {
     }
 
     public static Job createJob(String query) throws IOException {
-        System.out.println(googleCredentialsJson.charAt(0));
+        System.out.println(GCP_SERVICE_ACCOUNT_KEY.charAt(0));
         GoogleCredentials credentials = GoogleCredentials.fromStream(
-                new ByteArrayInputStream(googleCredentialsJson.getBytes(StandardCharsets.UTF_8))
+                new ByteArrayInputStream(GCP_SERVICE_ACCOUNT_KEY.getBytes(StandardCharsets.UTF_8))
         ).createScoped(Arrays.asList(
                                 "https://www.googleapis.com/auth/cloud-platform",
                                 "https://www.googleapis.com/auth/cloudplatformprojects.readonly"
