@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequestMapping("/stations")
@@ -17,7 +19,7 @@ public class StationController {
     StationService stationService;
 
     @PostMapping()
-    public StationHolder getStations(@RequestBody StationParamDTO params) {
+    public StationHolder getStations(@RequestBody StationParamDTO params) throws IOException {
         return stationService.getStations(params);
     }
 }

@@ -8,6 +8,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequestMapping("/trips")
@@ -17,7 +19,7 @@ public class TripController {
     TripService tripService;
 
     @PostMapping()
-    public TripHolder getTrips(@RequestBody TripParamDTO params) {
+    public TripHolder getTrips(@RequestBody TripParamDTO params) throws IOException {
         return tripService.getTrips(params);
     }
 }

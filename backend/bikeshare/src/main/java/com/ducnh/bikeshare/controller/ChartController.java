@@ -9,6 +9,8 @@ import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.web.bind.annotation.*;
 
+import java.io.IOException;
+
 @Slf4j
 @RestController
 @RequestMapping("/chart")
@@ -21,27 +23,27 @@ public class ChartController {
     TripService tripService;
 
     @PostMapping("/top10start")
-    public ChartHolder getTop10MostStartStations(@RequestBody TripParamDTO params) {
+    public ChartHolder getTop10MostStartStations(@RequestBody TripParamDTO params) throws IOException {
         return chartService.getChartData(tripService.parsedQuery(params), "Top 10 Start Stations");
     }
 
     @PostMapping("/top10end")
-    public ChartHolder getTop10MostEndStations(@RequestBody TripParamDTO params) {
+    public ChartHolder getTop10MostEndStations(@RequestBody TripParamDTO params) throws IOException {
         return chartService.getChartData(tripService.parsedQuery(params), "Top 10 End Stations");
     }
 
     @PostMapping("/subscriber_type")
-    public ChartHolder getSubscriberTypes(@RequestBody TripParamDTO params) {
+    public ChartHolder getSubscriberTypes(@RequestBody TripParamDTO params) throws IOException {
         return chartService.getChartData(tripService.parsedQuery(params), "Subscriber Types");
     }
 
     @PostMapping("/duration")
-    public ChartHolder getDuration(@RequestBody TripParamDTO params) {
+    public ChartHolder getDuration(@RequestBody TripParamDTO params) throws IOException {
         return chartService.getChartData(tripService.parsedQuery(params), "Duration");
     }
 
     @PostMapping("/time_period")
-    public ChartHolder getTimePeriod(@RequestBody TripParamDTO params) {
+    public ChartHolder getTimePeriod(@RequestBody TripParamDTO params) throws IOException {
         return chartService.getChartData(tripService.parsedQuery(params), "Time period");
     }
 }

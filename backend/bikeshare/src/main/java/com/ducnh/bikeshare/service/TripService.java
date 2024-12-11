@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class TripService implements ITripService{
     private static final Logger log = LoggerFactory.getLogger(TripService.class);
 
     @Override
-    public TripHolder getTrips(TripParamDTO params) {
+    public TripHolder getTrips(TripParamDTO params) throws IOException {
         log.info("query started");
 
         TripHolder tripHolder = new TripHolder();

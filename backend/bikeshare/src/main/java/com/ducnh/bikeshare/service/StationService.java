@@ -10,6 +10,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
+import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.*;
 
@@ -18,7 +19,7 @@ public class StationService implements IStationService{
     private static final Logger log = LoggerFactory.getLogger(StationService.class);
 
     @Override
-    public StationHolder getStations(StationParamDTO params) {
+    public StationHolder getStations(StationParamDTO params) throws IOException {
         log.info("query started");
 
         StationHolder stationHolder = new StationHolder();
