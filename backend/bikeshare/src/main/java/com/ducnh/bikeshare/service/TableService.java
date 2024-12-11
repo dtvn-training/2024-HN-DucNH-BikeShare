@@ -17,8 +17,8 @@ import java.util.UUID;
 
 @Service
 public class TableService {
-//    @Value("${GCP_SERVICE_ACCOUNT_KEY}")
-//    private static String GCP_SERVICE_ACCOUNT_KEY;
+    @Value("${GCP_SERVICE_ACCOUNT_KEY}")
+    public static String GCP_SERVICE_ACCOUNT_KEY;
 
     private static final Logger log = LoggerFactory.getLogger(TableService.class);
 
@@ -39,15 +39,15 @@ public class TableService {
     }
 
     public static Job createJob(String query) throws IOException {
-//        GoogleCredentials credentials = GoogleCredentials.fromStream(
-//                new ByteArrayInputStream(GCP_SERVICE_ACCOUNT_KEY.getBytes(StandardCharsets.UTF_8))
-//        ).createScoped(Arrays.asList(
-//                                "https://www.googleapis.com/auth/cloud-platform",
-//                                "https://www.googleapis.com/auth/cloudplatformprojects.readonly"
-//                        ));
+        GoogleCredentials credentials = GoogleCredentials.fromStream(
+                new ByteArrayInputStream(GCP_SERVICE_ACCOUNT_KEY.getBytes(StandardCharsets.UTF_8))
+        ).createScoped(Arrays.asList(
+                                "https://www.googleapis.com/auth/cloud-platform",
+                                "https://www.googleapis.com/auth/cloudplatformprojects.readonly"
+                        ));
 
         BigQuery bigQuery = BigQueryOptions.newBuilder()
-//                .setCredentials(credentials)
+                .setCredentials(credentials)
                 .setProjectId("springboot-bq")
                 .build()
                 .getService();
