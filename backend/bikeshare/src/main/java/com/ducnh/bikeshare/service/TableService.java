@@ -18,7 +18,7 @@ import java.util.UUID;
 @Service
 public class TableService {
     @Value("${GCP_SERVICE_ACCOUNT_KEY}")
-    public static String GCP_SERVICE_ACCOUNT_KEY;
+    String GCP_SERVICE_ACCOUNT_KEY;
 
     private static final Logger log = LoggerFactory.getLogger(TableService.class);
 
@@ -38,7 +38,7 @@ public class TableService {
         return !row.get(param).isNull() ? row.get(param).getTimestampInstant().atZone(ZoneId.of("UTC")).toLocalDateTime() : null;
     }
 
-    public static Job createJob(String query) throws IOException {
+    public Job createJob(String query) throws IOException {
         GoogleCredentials credentials = GoogleCredentials.fromStream(
                 new ByteArrayInputStream(GCP_SERVICE_ACCOUNT_KEY.getBytes(StandardCharsets.UTF_8))
         ).createScoped(Arrays.asList(

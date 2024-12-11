@@ -8,6 +8,7 @@ import com.google.cloud.bigquery.*;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -17,6 +18,9 @@ import java.util.*;
 @Service
 public class TripService implements ITripService{
     private static final Logger log = LoggerFactory.getLogger(TripService.class);
+
+    @Autowired
+    TableService tableService;
 
     @Override
     public TripHolder getTrips(TripParamDTO params) throws IOException {
@@ -31,7 +35,7 @@ public class TripService implements ITripService{
         String query = parsedQuery(params);
         log.info(query);
 
-        Job queryJob = TableService.createJob(query);
+        Job queryJob = tableService.createJob(query);
 
         getResponseData(queryJob, tripHolder);
 

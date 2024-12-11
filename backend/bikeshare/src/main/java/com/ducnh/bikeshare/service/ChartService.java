@@ -8,6 +8,7 @@ import com.google.cloud.bigquery.TableResult;
 import org.apache.ibatis.jdbc.SQL;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +19,9 @@ import java.util.List;
 @Service
 public class ChartService {
     private static final Logger log = LoggerFactory.getLogger(ChartService.class);
+
+    @Autowired
+    TableService tableService;
 
     public ChartHolder getChartData(String nestedQuery, String chartName) throws IOException {
         log.info("query started");
@@ -52,7 +56,7 @@ public class ChartService {
 
         log.info(query);
 
-        Job queryJob = TableService.createJob(query);
+        Job queryJob = tableService.createJob(query);
 
         getResponseData(queryJob, chartHolder, attribute);
 
