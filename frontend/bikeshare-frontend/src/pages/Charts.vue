@@ -34,7 +34,6 @@ import AppHeader from '@/components/AppHeader.vue';
 import BarChart from '@/components/BarChart.vue';
 import LineChart from '@/components/LineChart.vue';
 import api from '@/config/api';
-import { onMounted } from 'vue';
 import { useRoute } from 'vue-router';
 
 const chart_data = ref()
@@ -238,7 +237,6 @@ async function getTimePeriod() {
     min-width: 300px;
     max-width: 1000px;
     height: 750px;
-    /* display: flex; */
     justify-content: center;
     align-items: center;
     border: 1px solid #ccc;

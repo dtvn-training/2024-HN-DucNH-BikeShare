@@ -1,6 +1,6 @@
 import axios from 'axios';
 const api = axios.create({
-    baseURL: 'https://two024-hn-ducnh-bikeshare-atsk.onrender.com/',
+    baseURL: 'http://localhost:8080/',
     timeout: 480000,
     headers: {
         'Content-Type': 'application/json',

@@ -13,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import java.io.IOException;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Service
@@ -52,7 +51,7 @@ public class ChartService {
             case "Time period":
                 query = queryTimePeriod(nestedQuery);
                 attribute = "hour";
-        };
+        }
 
         log.info(query);
 
@@ -87,13 +86,12 @@ public class ChartService {
             }
 
         } catch (Exception e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
             log.error("Error: {}", e.getMessage());
         }
     }
 
     private String queryTop10StartStations(String nestedQuery) {
-        return new SQL(){{
+        return new SQL() {{
             SELECT("start_station_name", "COUNT(start_station_name) AS count");
             FROM("(" + nestedQuery + ")");
             GROUP_BY("start_station_name");
@@ -103,7 +101,7 @@ public class ChartService {
     }
 
     private String queryTop10EndStations(String nestedQuery) {
-        return new SQL(){{
+        return new SQL() {{
             SELECT("end_station_name", "COUNT(end_station_name) AS count");
             FROM("(" + nestedQuery + ")");
             GROUP_BY("end_station_name");
@@ -113,7 +111,7 @@ public class ChartService {
     }
 
     private String querySubscriberType(String nestedQuery) {
-        return new SQL(){{
+        return new SQL() {{
             SELECT("subscriber_type", "COUNT(end_station_name) AS count");
             FROM("(" + nestedQuery + ")");
             GROUP_BY("subscriber_type");
@@ -122,7 +120,7 @@ public class ChartService {
     }
 
     private String queryDuration(String nestedQuery) {
-        return new SQL(){{
+        return new SQL() {{
             SELECT("duration_minutes", "COUNT(duration_minutes) AS count");
             FROM("(" + nestedQuery + ")");
             WHERE("duration_minutes <= 70");
@@ -132,20 +130,11 @@ public class ChartService {
     }
 
     private String queryTimePeriod(String nestedQuery) {
-        return new SQL(){{
+        return new SQL() {{
             SELECT("EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC') AS hour", "COUNT(EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC')) AS count");
             FROM("(" + nestedQuery + ")");
             GROUP_BY("hour");
             ORDER_BY("hour");
         }}.toString();
     }
-
-//    private String queryTimePeriod(String nestedQuery) {
-//        return new SQL(){{
-//            SELECT("FLOOR(EXTRACT(HOUR FROM start_time AT TIME ZONE 'UTC') / 2) * 2 AS hour", "COUNT(*) AS count");
-//            FROM("(" + nestedQuery + ")");
-//            GROUP_BY("hour");
-//            ORDER_BY("hour");
-//        }}.toString();
-//    }
 }

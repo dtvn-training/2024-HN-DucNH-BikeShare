@@ -82,7 +82,6 @@ public class StationService implements IStationService{
             }
 
         } catch (Exception e) {
-            System.out.println(Arrays.toString(e.getStackTrace()));
             log.error("Error: {}", e.getMessage());
             return;
         }

@@ -15,9 +15,7 @@ public class Trip {
     private String bike_id;
     private String bike_type;
     private LocalDateTime start_time;
-//    private Integer start_station_id;
     private String start_station_name;
-//    private String end_station_id;
     private String end_station_name;
     private Integer duration_minutes;
 }
